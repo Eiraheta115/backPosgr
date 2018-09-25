@@ -8,9 +8,9 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 from .models import  Noticia, Aspirante,Image, Validacion, Cita
 from rest_framework.authtoken.models import Token
-import json,datetime,time, random, requests, hashlib, calendar
+import json,time, random, requests, hashlib, calendar
 from django.core import serializers
-from datetime import datetime
+from datetime import datetime, date
 
 class PermissionMixinAPICreate(mixins.CreateModelMixin, generics.ListAPIView):
     permission_classes = (AllowAny,)
@@ -280,5 +280,18 @@ def agendarCita(request):
             content = {'guardado':True}
             return Response(content, status=status.HTTP_201_CREATED)
         
-
-    
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def obtenerCitasMes(request, mes, anio):
+    an=int(anio)
+    strmes=str(mes)
+    diaFIn={'1':31,'2':28,'3':31,'4':30,'5':31,'6':30,'7':31,'8':31,'9':30,'10':31,'11':30,'12':31,'2b':29}
+    if(an % 4 == 0 and an % 100 != 0 or an % 400 == 0):
+        fin='2b'
+        dFin=diaFIn[fin]
+    dFin=diaFIn[strmes]
+    start_date = date(int(anio), int(mes), 1)
+    end_date = date(int(anio), int(mes), int(dFin))
+    c=Cita.objects.values_list('id_cita','titulo','fecha_hora_inicio','fecha_hora_fin').filter(fecha_hora_inicio__range=(start_date, end_date))
+    return str(c)
+    #https://stackoverflow.com/questions/15874233/output-django-queryset-as-json
