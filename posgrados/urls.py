@@ -14,7 +14,6 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^services/usuarios/$', views.Usuario2APICreateView.as_view(), name='usuario-create'),
     url(r'^services/asignaroless/(?P<id>(\d+))/usuario/(?P<id2>(\d+))/$', views.asignarrol, name='roles-usuarios'),
-    url(r'^citas/(?P<mes>(\d+))/(?P<anio>(\d+))/$', views.obtenerCitasMes, name='citas-mes'),
     url(r'^services/roles/$', views.GroupAPICreateView.as_view(), name='roles-create'),
     url(r'^services/permisos/$', views.PermissionsAPICreate.as_view(), name='permisos-create'),
     url(r'^services/rolpermisos/$', views.PermissionMixinAPICreate.as_view(), name='rolpermisos-create'),
@@ -28,7 +27,12 @@ urlpatterns = [
     url(r'^generarCodigos/$', views.genCo, name='genCod'),
     url(r'^imprimirCodigos/$', views.impCod, name='impCod'),
     url(r'^validarCodigo/$',views.validarCodigo, name='validar-codigo'),
-    url(r'^citas/crear/$',views.agendarCita, name='agendar-cita')
-
-
+    url(r'^citas/crear/$',views.agendarCita, name='agendar-cita'),
+    url(r'^citas/(?P<mes>(\d+))/(?P<anio>(\d+))/$', views.obtenerCitasMes, name='citas-mes'),
+    url(r'^citas/detalle/(?P<idCita>(\d+))/$', views.detalleCita, name='detalle-cita'),
+    url(r'^citas/cancelar/(?P<idCita>(\d+))/$', views.cancelarCita, name='cancelar-cita'),
+    url(r'^citas/detalle/editar/(?P<idCita>(\d+))/$', views.editarCita, name='editar-cita'),
+    url(r'^citas/notificaciones/$',views.notificacionesManana, name='notificaciones-cita'),
+    url(r'^citas/citasProximas/$',views.citasProximas, name='cita-proximas'),
+    url(r'^citas/entidades/(?P<idCargo>(\d+))/$', views.entidades, name='entidades-cita'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

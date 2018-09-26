@@ -8,9 +8,9 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.response import Response
 from .models import  Noticia, Aspirante,Image, Validacion, Cita
 from rest_framework.authtoken.models import Token
-import json,time, random, requests, hashlib, calendar
+import json,time, random, requests, hashlib, calendar, datetime
 from django.core import serializers
-from datetime import datetime, date
+#from datetime import datetime, date
 
 class PermissionMixinAPICreate(mixins.CreateModelMixin, generics.ListAPIView):
     permission_classes = (AllowAny,)
@@ -178,12 +178,12 @@ def validarCodigo(request):
 @permission_classes((AllowAny, ))
 def crearNoticias(request):
     data = json.loads(request.body)
-    apiKey = "435794978697618"
-    apiSecret = "hzyKk4HoLpb_O8gTqhaYPc0FGiY"
+    apiKey = "217796461126348"
+    apiSecret = "INJTRbK_mh3rfqIXblwJd8tz5LQ"
     timestamp = calendar.timegm(time.gmtime())
     sign = "timestamp="+str(timestamp)+apiSecret
     signature = hashlib.sha1(sign.encode('utf-8')).hexdigest()
-    noti= requests.post("https://api.cloudinary.com/v1_1/ddjmdjmvk/image/upload", data={'file':data["foto"], 'api_key':apiKey, 'timestamp':timestamp, 'signature':signature})
+    noti= requests.post("https://api.cloudinary.com/v1_1/dhbegt4ry/image/upload", data={'file':data["foto"], 'api_key':apiKey, 'timestamp':timestamp, 'signature':signature})
     print (noti)
     Noticia.objects.create(emcabezado=data["encabezado"],
     cuerpo=data["cuerpo"],
@@ -237,11 +237,13 @@ def agendarCita(request):
     lugar=data["lugar"]
     diaCompleto=data["diaCompleto"]
     ##Fecha inicio
-    fechaHoraInicio=datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S")
+    fechaHoraInicio=datetime.datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S")
+    #fechaHoraInicioM=datetime.datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S") + datetime.timedelta(days=1)
     fechaInicio=fechaHoraInicio.strftime("%d/%m/%y")
-    horaInicio=fechaHoraInicio.strftime("%H:%M:%S")
+    #fechaInicioM=fechaHoraInicioM.strftime("%d/%m/%y")
+    #horaInicio=fechaHoraInicio.strftime("%H:%M:%S")
     ##Fecha fin
-    fechaHoraFin=datetime.strptime(data["FechaHoraFin"], "%d/%m/%y %H:%M:%S")
+    fechaHoraFin=datetime.datetime.strptime(data["FechaHoraFin"], "%d/%m/%y %H:%M:%S")
     citaPara=data["citaPara"]
     citaCon=data["citaCon"]
     nombrePara=data["nombrePara"]
@@ -255,8 +257,8 @@ def agendarCita(request):
             content = {'mensaje': 'No se puede agendar citas al mismo usuario'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         if (diaCompleto==True):
-            fechaHoraInicio=datetime.strptime(fechaInicio+" 00:00:00","%d/%m/%y %H:%M:%S")
-            fechaHoraFin=datetime.strptime(fechaInicio+" 23:59:59","%d/%m/%y %H:%M:%S")
+            fechaHoraInicio=datetime.datetime.strptime(fechaInicio+" 00:00:00","%d/%m/%y %H:%M:%S")
+            fechaHoraFin=datetime.datetime.strptime(fechaInicio+" 23:59:59","%d/%m/%y %H:%M:%S")
         
         userPara = User.objects.get(id=data["citaPara"])
         userCon = User.objects.get(id=data["citaCon"])
@@ -280,9 +282,11 @@ def agendarCita(request):
             content = {'guardado':True}
             return Response(content, status=status.HTTP_201_CREATED)
         
+
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
 def obtenerCitasMes(request, mes, anio):
+    data=[]
     an=int(anio)
     strmes=str(mes)
     diaFIn={'1':31,'2':28,'3':31,'4':30,'5':31,'6':30,'7':31,'8':31,'9':30,'10':31,'11':30,'12':31,'2b':29}
@@ -290,8 +294,157 @@ def obtenerCitasMes(request, mes, anio):
         fin='2b'
         dFin=diaFIn[fin]
     dFin=diaFIn[strmes]
-    start_date = date(int(anio), int(mes), 1)
-    end_date = date(int(anio), int(mes), int(dFin))
-    c=Cita.objects.values_list('id_cita','titulo','fecha_hora_inicio','fecha_hora_fin').filter(fecha_hora_inicio__range=(start_date, end_date))
-    return str(c)
+    start_date = datetime.date(int(anio), int(mes), 1)
+    end_date = datetime.date(int(anio), int(mes), int(dFin))
+    citas=Cita.objects.filter(fecha_hora_inicio__range=(start_date, end_date),cancelado=False)
+    for cita in citas:
+        cit ={
+            'id':cita.id_cita,
+            'title':cita.titulo,
+            'start':cita.fecha_hora_inicio,
+            'end':cita.fecha_hora_fin
+        }
+        data.append(cit)
+    
+    content = {"citas": data}
+    return Response(content, status=status.HTTP_200_OK)
     #https://stackoverflow.com/questions/15874233/output-django-queryset-as-json
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detalleCita(request, idCita):
+    try:
+        cita = Cita.objects.get(id_cita=idCita)
+        cita ={
+            'evento':cita.titulo,
+            'descripcion':cita.descripcion,
+            'fechaHorainicio':cita.fecha_hora_inicio,
+            'fechaHorafin':cita.fecha_hora_fin,
+            'lugar':cita.lugar,
+            'citaPara':cita.id_user_para.username,
+            'citaCon':cita.id_user_con.username,
+            'cancelado':cita.cancelado
+        }
+        content = {"detalle": cita}
+        return Response(content, status=status.HTTP_200_OK)
+    except Cita.DoesNotExist:
+        content = {"mensaje": "La cita no existe"}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def cancelarCita(request, idCita):
+    try:
+        c=Cita.objects.get(id_cita=idCita)
+        c.cancelado=True
+        c.save()
+        content = {"actualizado": True}
+        return Response(content, status=status.HTTP_200_OK)
+    except Cita.DoesNotExist:
+        content = {"mensaje": "La cita no existe"}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def editarCita(request, idCita):
+    data = json.loads(request.body)
+    try:
+        c=Cita.objects.get(id_cita=idCita)
+        data = json.loads(request.body)
+        evento =data["evento"]
+        descripcion=data["descripcion"]
+        lugar=data["lugar"]
+        diaCompleto=data["diaCompleto"]
+        ##Fecha inicio
+        fechaHoraInicio=datetime.datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S")
+        #fechaHoraInicioM=datetime.datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S") + datetime.timedelta(days=1)
+        fechaInicio=fechaHoraInicio.strftime("%d/%m/%y")
+        #fechaInicioM=fechaHoraInicioM.strftime("%d/%m/%y")
+        ##Fecha fin
+        fechaHoraFin=datetime.datetime.strptime(data["FechaHoraFin"], "%d/%m/%y %H:%M:%S")
+        citaPara=data["citaPara"]
+        citaCon=data["citaCon"]
+        nombrePara=data["nombrePara"]
+        nombreCon=data["nombreCon"]
+                
+        if (nombrePara is None and nombreCon is None and citaPara is None and citaCon is None):
+            content = {'mensaje': 'No se puede agendar sin registrar los nombres de las entidades'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            if (citaPara==citaCon):
+                content = {'mensaje': 'No se puede agendar citas al mismo usuario'}
+                return Response(content, status=status.HTTP_400_BAD_REQUEST)
+            if (diaCompleto==True):
+                fechaHoraInicio=datetime.datetime.strptime(fechaInicio+" 06:00:00","%d/%m/%y %H:%M:%S")
+                fechaHoraFin=datetime.datetime.strptime(fechaInicio+" 23:59:59","%d/%m/%y %H:%M:%S")
+            
+            userPara = User.objects.get(id=data["citaPara"])
+            userCon = User.objects.get(id=data["citaCon"])
+            
+            c.titulo=evento
+            c.descripcion=descripcion
+            c.fecha_hora_inicio=fechaHoraInicio
+            c.fecha_hora_fin=fechaHoraFin
+            c.lugar=lugar
+            c.nombre_para=nombrePara
+            c.nombre_con=nombreCon
+            c.dia_completo=diaCompleto
+            c.id_user_para=userPara
+            c.id_user_con=userCon
+            c.save()
+            content = {'editado':True}
+            return Response(content, status=status.HTTP_200_OK)
+    except Cita.DoesNotExist:
+        content = {"mensaje": "La cita no existe"}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def notificacionesManana(request):
+    anio = (datetime.date.today() + datetime.timedelta(days=1)).year
+    dia = (datetime.date.today() + datetime.timedelta(days=1)).day
+    mes = (datetime.date.today() + datetime.timedelta(days=1)).month
+    citas=Cita.objects.filter(fecha_hora_inicio=datetime.date(anio,mes,dia),id_user_para=1).count()
+    content = {'cantida':citas}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def citasProximas(request):
+    data=[]
+    anio = (datetime.date.today() + datetime.timedelta(days=1)).year
+    dia = (datetime.date.today() + datetime.timedelta(days=1)).day
+    mes = (datetime.date.today() + datetime.timedelta(days=1)).month
+    citas=Cita.objects.filter(fecha_hora_inicio=datetime.date(anio,mes,dia),id_user_para=1)
+    for cita in citas:
+        c ={
+            'id':cita.id_cita,
+            'evento':cita.titulo,
+            'descripcion':cita.descripcion,
+            'FechaHoraInicio':cita.fecha_hora_inicio,
+            'FechaHoraFin':cita.fecha_hora_fin
+        }
+        data.append(c)
+    content = {'citas':data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def entidades(request, idCargo):
+    usuarios=[]
+    grupos = {'1':'comunicaciones','2':'secretaria'}
+    g=grupos[str(idCargo)]
+    if (g=="comunicaciones"):
+        users=User.objects.exclude(id=1)
+    else:
+        users=User.objects.all()
+    for u in users:
+        user={
+            'id':u.id,
+            'nombreUsuario':u.username,
+            'nombre':u.first_name,
+            'apellido':u.last_name
+        }
+        usuarios.append(user)
+    content = {'usuarios':usuarios}
+    return Response(content, status=status.HTTP_200_OK)
