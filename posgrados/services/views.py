@@ -237,19 +237,13 @@ def agendarCita(request):
     lugar=data["lugar"]
     diaCompleto=data["diaCompleto"]
     ##Fecha inicio
-    fechaHoraInicio=datetime.datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S")
-    #fechaHoraInicioM=datetime.datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S") + datetime.timedelta(days=1)
-    fechaInicio=fechaHoraInicio.strftime("%d/%m/%y")
-    #fechaInicioM=fechaHoraInicioM.strftime("%d/%m/%y")
-    #horaInicio=fechaHoraInicio.strftime("%H:%M:%S")
-    ##Fecha fin
-    fechaHoraFin=datetime.datetime.strptime(data["FechaHoraFin"], "%d/%m/%y %H:%M:%S")
+    fechaHoraInicio=datetime.datetime.strptime(data["FechaHoraInicio"], "%Y-%m-%d %H:%M:%S")
+    fechaInicio=fechaHoraInicio.strftime("%Y-%m-%d")
+    
     citaPara=data["citaPara"]
     citaCon=data["citaCon"]
-    nombrePara=data["nombrePara"]
-    nombreCon=data["nombreCon"]
-            
-    if (nombrePara is None and nombreCon is None and citaPara is None and citaCon is None):
+ 
+    if (citaPara is None and citaCon is None):
         content = {'mensaje': 'No se puede agendar sin registrar los nombres de las entidades'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     else:
@@ -257,11 +251,23 @@ def agendarCita(request):
             content = {'mensaje': 'No se puede agendar citas al mismo usuario'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         if (diaCompleto==True):
-            fechaHoraInicio=datetime.datetime.strptime(fechaInicio+" 00:00:00","%d/%m/%y %H:%M:%S")
-            fechaHoraFin=datetime.datetime.strptime(fechaInicio+" 23:59:59","%d/%m/%y %H:%M:%S")
+            fechaHoraInicio=datetime.datetime.strptime(fechaInicio+" 00:00:00","%Y-%m-%d %H:%M:%S")
+            fechaHoraFin=datetime.datetime.strptime(fechaInicio+" 23:59:59","%Y-%m-%d %H:%M:%S")
+        else:
+            fechaHoraFin=datetime.datetime.strptime(data["FechaHoraFin"], "%Y-%m-%d %H:%M:%S")
         
-        userPara = User.objects.get(id=data["citaPara"])
-        userCon = User.objects.get(id=data["citaCon"])
+        try:
+            userPara = User.objects.get(id=data["citaPara"])
+            nombrePara=userPara.username
+        except User.DoesNotExist:
+            content = {'mensaje': 'UsuarioPara no existe'}
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
+        try:
+            userCon = User.objects.get(id=data["citaCon"])
+            nombreCon = userCon.username
+        except User.DoesNotExist:
+            content = {'mensaje': 'UsuarioCon no existe'}
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
         
         c=Cita.objects.get_or_create(titulo=evento,
         descripcion=descripcion,
@@ -350,24 +356,18 @@ def editarCita(request, idCita):
     data = json.loads(request.body)
     try:
         c=Cita.objects.get(id_cita=idCita)
-        data = json.loads(request.body)
         evento =data["evento"]
         descripcion=data["descripcion"]
         lugar=data["lugar"]
         diaCompleto=data["diaCompleto"]
         ##Fecha inicio
-        fechaHoraInicio=datetime.datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S")
-        #fechaHoraInicioM=datetime.datetime.strptime(data["FechaHoraInicio"], "%d/%m/%y %H:%M:%S") + datetime.timedelta(days=1)
-        fechaInicio=fechaHoraInicio.strftime("%d/%m/%y")
-        #fechaInicioM=fechaHoraInicioM.strftime("%d/%m/%y")
-        ##Fecha fin
-        fechaHoraFin=datetime.datetime.strptime(data["FechaHoraFin"], "%d/%m/%y %H:%M:%S")
+        fechaHoraInicio=datetime.datetime.strptime(data["FechaHoraInicio"], "%Y-%m-%d %H:%M:%S")
+        fechaInicio=fechaHoraInicio.strftime("%Y-%m-%d")
+        
         citaPara=data["citaPara"]
         citaCon=data["citaCon"]
-        nombrePara=data["nombrePara"]
-        nombreCon=data["nombreCon"]
-                
-        if (nombrePara is None and nombreCon is None and citaPara is None and citaCon is None):
+    
+        if (citaPara is None and citaCon is None):
             content = {'mensaje': 'No se puede agendar sin registrar los nombres de las entidades'}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
         else:
@@ -375,11 +375,23 @@ def editarCita(request, idCita):
                 content = {'mensaje': 'No se puede agendar citas al mismo usuario'}
                 return Response(content, status=status.HTTP_400_BAD_REQUEST)
             if (diaCompleto==True):
-                fechaHoraInicio=datetime.datetime.strptime(fechaInicio+" 06:00:00","%d/%m/%y %H:%M:%S")
-                fechaHoraFin=datetime.datetime.strptime(fechaInicio+" 23:59:59","%d/%m/%y %H:%M:%S")
+                fechaHoraInicio=datetime.datetime.strptime(fechaInicio+" 00:00:00","%Y-%m-%d %H:%M:%S")
+                fechaHoraFin=datetime.datetime.strptime(fechaInicio+" 23:59:59","%Y-%m-%d %H:%M:%S")
+            else:
+                fechaHoraFin=datetime.datetime.strptime(data["FechaHoraFin"], "%Y-%m-%d %H:%M:%S")
             
-            userPara = User.objects.get(id=data["citaPara"])
-            userCon = User.objects.get(id=data["citaCon"])
+            try:
+                userPara = User.objects.get(id=data["citaPara"])
+                nombrePara=userPara.username
+            except User.DoesNotExist:
+                content = {'mensaje': 'UsuarioPara no existe'}
+                return Response(content, status=status.HTTP_404_NOT_FOUND)
+            try:
+                userCon = User.objects.get(id=data["citaCon"])
+                nombreCon = userCon.username
+            except User.DoesNotExist:
+                content = {'mensaje': 'UsuarioCon no existe'}
+                return Response(content, status=status.HTTP_404_NOT_FOUND)
             
             c.titulo=evento
             c.descripcion=descripcion
