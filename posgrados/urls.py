@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^validarCodigo/$',views.validarCodigo, name='validar-codigo'),
     url(r'^citas/crear/$',views.agendarCita, name='agendar-cita'),
     url(r'^citas/(?P<mes>(\d+))/(?P<anio>(\d+))/$', views.obtenerCitasMes, name='citas-mes'),
+    url(r'^citas/(?P<mes>(\d+))/(?P<anio>(\d+))/estudiantes/(?P<idEstudiante>(\d+))/$', views.obtenerCitasMesEstudiantes, name='citas-estudiantes'),
     url(r'^citas/detalle/(?P<idCita>(\d+))/$', views.detalleCita, name='detalle-cita'),
     url(r'^citas/cancelar/(?P<idCita>(\d+))/$', views.cancelarCita, name='cancelar-cita'),
     url(r'^citas/detalle/editar/(?P<idCita>(\d+))/$', views.editarCita, name='editar-cita'),
