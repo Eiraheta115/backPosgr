@@ -427,7 +427,8 @@ def citasProximas(request):
             'evento':cita.titulo,
             'descripcion':cita.descripcion,
             'FechaHoraInicio':cita.fecha_hora_inicio,
-            'FechaHoraFin':cita.fecha_hora_fin
+            'FechaHoraFin':cita.fecha_hora_fin,
+            'lugar':cita.lugar
         }
         data.append(c)
     content = {'citas':data}
