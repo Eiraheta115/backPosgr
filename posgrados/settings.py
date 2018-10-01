@@ -27,11 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['postgradosv2.herokuapp.com', '127.0.0.1', '127.0.0.1:4200' ]
 
-#CLOUDINARY = {
-#  'cloud_name': 'ddjmdjmvk',  
-#  'api_key': '435794978697618',  
-#  'api_secret': 'hzyKk4HoLpb_O8gTqhaYPc0FGiY',  
-#}
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'eposgradosfchues@gmail.com'
+EMAIL_HOST_PASSWORD = 'posgrados2018'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 
 # Application definition
 

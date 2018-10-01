@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group, Permission, PermissionsMixin
 from rest_framework import serializers
 
 
-from .models import  Noticia, Aspirante,Image, Validacion
+from .models import  Noticia, Aspirante,Image, Docente, Procedimiento,Pasos, Validacion
 
 
 class RolUsuariosSerializer(serializers.HyperlinkedModelSerializer):
@@ -73,6 +73,10 @@ class AspiranteSerializer(serializers.ModelSerializer):
         model = Aspirante
         fields = '__all__'
 
+    def create(self, validated_data):
+        aspirante = Aspirante.objects.create(**validated_data)
+        return aspirante
+
 
 class ImgSerializer(serializers.ModelSerializer):
     img = serializers.ImageField(max_length=None, use_url=True)
@@ -81,7 +85,25 @@ class ImgSerializer(serializers.ModelSerializer):
         model= Image
         fields= '__all__'
 
-class CodigoSerializer(serializers.HyperlinkedModelSerializer):
+class DocentesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Docente
+        fields = '__all__'
+        extra_kwargs = {'password': {'write_only': True, 'required': True}}
+
+    def create(self, validated_data):
+        docente = Docente.objects.create(**validated_data)
+        return docente
+
+class PasosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pasos
+        fields = '__all__'
+
+class ProcedimientosSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Procedimiento
+        fields = '__all__'
     class Meta:
         model = Validacion
         fields = '__all__'

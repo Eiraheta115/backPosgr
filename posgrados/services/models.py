@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 #
@@ -31,6 +32,7 @@ class Image(models.Model):
 
 class Aspirante (models.Model) :
     id_aspirante = models.AutoField(primary_key=True)
+    nombreuser_aspirante = models.CharField(max_length=10, unique=True, blank=True, null=True)
     nombre_aspirante = models.CharField(max_length=20)
     apellido_aspirante = models.CharField(max_length=20)
     contrasena_aspirante = models.CharField(max_length=10)
@@ -46,12 +48,30 @@ class Aspirante (models.Model) :
     municipio = models.CharField(max_length=50)
     lugar_trab = models.CharField(max_length=50)
     programa = models.CharField(max_length=50)
+    aceptado = models.BooleanField(blank=True, default=False)
     id_user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, )
     id_val = models.ForeignKey('validacion', models.SET_NULL, blank=True, null=True, )
 
     def __str__(self):
                 return str(self.nombre_aspirante)
 
+class Docente(models.Model) :
+    id_docente = models.AutoField(primary_key=True)
+    usuario = models.CharField(max_length=15,unique=True, blank=True, null=True,)
+    password = models.CharField(max_length=10)
+    nombre = models.CharField(max_length=30)
+    apellido = models.CharField(max_length=30)
+    dui = models.CharField(max_length=10)
+    genero = models.CharField(max_length=15)
+    fecha_naci = models.DateField()
+    telefono = models.CharField(max_length=15, blank=True, null=True,)
+    movil = models.CharField(max_length=15, blank=True, null=True,)
+    email = models.CharField(max_length=35)
+    formacion = models.CharField(max_length=200, blank=True)
+    titulo =models.CharField(max_length=200, blank=True, null=True,)
+
+    def __str__(self):
+        return (self.nombre,self.apellido)
 
 class Validacion (models.Model):
     id_codigo=models.AutoField(primary_key=True)
@@ -63,41 +83,23 @@ class Validacion (models.Model):
     def __str__(self):
                 return str(self.codigo)
 
-class Procedimiento (models.Model):
-    id_procedimiento=models.AutoField(primary_key=True)
-    nombre=models.CharField(max_length=50)
-    descripcion=models.CharField(max_length=250)
+class Procedimiento(models.Model):
+    id_procedimiento = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=500)
 
     def __str__(self):
-                return str(self.nombre)
+        return(self.nombre)
 
-class Pasos (models.Model):
-    id_paso=models.AutoField(primary_key=True)
-    id_procedimiento=models.ForeignKey(Procedimiento, models.SET_NULL, blank=True, null=True, )
-    nombre=models.CharField(max_length=50)
-    descripcion=models.CharField(max_length=50)
-    orden=models.IntegerField()
-
-    def __str__(self):
-                return str(self.nombre)
-
-class Docente (models.Model):
-    id_docente=models.AutoField(primary_key=True)
-    id_user_con = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, )
-    nombres=models.CharField(max_length=50)
-    apellidos=models.CharField(max_length=50)
-    contrasena=models.CharField(max_length=10)
-    dui = models.CharField(max_length=9)
-    genero = models.CharField(max_length=9)
-    fechas_nac = models.DateField()
-    t_fijo = models.CharField(max_length=10)
-    t_movil = models.CharField(max_length=10)
-    email = models.CharField(max_length=50)
-    titulo_pre = models.CharField(max_length=30)
-    formacion_aca = models.CharField(max_length=30)
+class Pasos(models.Model):
+    id_paso = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=500)
+    id_proceimiento = models.ForeignKey('Procedimiento', models.SET_NULL, blank=True, null=True,)
+    orden = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-                return str(self.dui)
+        return(self.nombre)
 
 class Cita (models.Model):
     id_cita=models.AutoField(primary_key=True)
