@@ -8,7 +8,7 @@ from .serializers import UserSerializer, ImgSerializer,RolUsuariosSerializer,Pas
 from rest_framework import status, viewsets, generics, mixins
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import  Noticia, Aspirante,Image, Docente, Pasos ,Procedimiento, Cita
+from .models import  Noticia, Aspirante,Image, Docente, Pasos ,Procedimiento, Cita, Validacion
 from rest_framework.authtoken.models import Token
 import json,time, random, requests, hashlib, calendar, datetime
 
@@ -692,3 +692,45 @@ def obtenerCitasMesYear(request, mes, anio):
     
     content = {"citas": data}
     return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regApirante(request):
+    data = json.loads(request.body)
+    u, userAsp = User.objects.get_or_create(username=data["nombreuser_aspirante"], email=data["email"])
+    if userAsp:
+        u.set_password(data["password"])
+        u.save()
+        try:
+            v = Validacion.objects.get(id_codigo=data["idVal"])
+        except Validacion.DoesNotExist:
+            content = {"msj": "codigo no existe"}
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+        Aspirante.objects.create(
+            nombre_aspirante=data["nombreAsp"],
+            apellido_aspirante=data["apellidoAsp"],
+            contrasena_aspirante=hashlib.md5(data["password"].encode('utf-8')),
+            dui=data["dui"],
+            genero=data["genero"],
+            fechas_nac=data["fechas_nac"],
+            t_fijo=data["t_fijo"],
+            t_movil=data["t_movil"],
+            email=data["email"],
+            titulo_pre=data["titulo_pre"],
+            institucion=data["institucion"],
+            f_expedicion=data["f_expedicion"],
+            municipio=data["municipio"], 
+            lugar_trab=data["lugar_trab"],  
+            programa=data["programa"],
+            aceptado=False,
+            nombreuser_aspirante=data["nombreuser_aspirante"],
+            id_user=u,
+            id_val=v
+            )
+        content = {"guardado": True}
+        return Response(content, status=status.HTTP_201_CREATED)
+    else:
+        content = {"msj": "usuario ya existe"}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+

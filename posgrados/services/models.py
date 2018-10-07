@@ -35,7 +35,7 @@ class Aspirante (models.Model) :
     nombreuser_aspirante = models.CharField(max_length=10, unique=True, blank=True, null=True)
     nombre_aspirante = models.CharField(max_length=20)
     apellido_aspirante = models.CharField(max_length=20)
-    contrasena_aspirante = models.CharField(max_length=10)
+    contrasena_aspirante = models.CharField(max_length=256)
     dui = models.CharField(max_length=9)
     genero = models.CharField(max_length=9)
     fechas_nac = models.DateField()

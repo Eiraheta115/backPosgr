@@ -45,5 +45,5 @@ urlpatterns = [
     url(r'^services/pasos/(?P<id_paso>(\d+))/$',views.PasosApiCreateRetrive.as_view(), name='pasos-create'),
     url(r'^services/pasos/$',views.Pasosnuevos, name='pasos-create'),
     url(r'^services/procedimiento/(?P<id_procedimiento>(\d+))/$',views.ProcedimientoApiCreateRetrive.as_view(), name='procedimiento-create'),
-    url(r'^services/procedimiento/$',views.ProcedimientoApiCreate.as_view(), name='procedimiento-create'),
+    url(r'^services/aspirante/v2/$',views.regApirante, name='reg-aspv2'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
