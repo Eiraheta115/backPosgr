@@ -114,7 +114,7 @@ class NoticiaAPICreate(mixins.CreateModelMixin, generics.ListAPIView):
     serializer_class = NoticiaSerializer
 
     def get_queryset(self):
-        return Noticia.objects.all()
+        return Noticia.objects.all().order_by('-fecha')
 
     def post(self, request , *args, **kwargs):
         return self.create(request , *args, **kwargs)
