@@ -46,4 +46,25 @@ urlpatterns = [
     url(r'^services/pasos/$',views.Pasosnuevos, name='pasos-create'),
     url(r'^services/procedimiento/(?P<id_procedimiento>(\d+))/$',views.ProcedimientoApiCreateRetrive.as_view(), name='procedimiento-create'),
     url(r'^services/aspirante/v2/$',views.regApirante, name='reg-aspv2'),
+    ##horario
+    url(r'^services/horarios/$',views.regHorario, name='horario-create'),
+    url(r'^services/horarios/all/$',views.getHorario, name='horario-all'),
+    url(r'^services/horarios/unable/(?P<id_horario>(\d+))/$',views.unableHorario, name='horario-create'),
+    ##aula
+    url(r'^services/aulas/$',views.regAula, name='aula-create'),
+    url(r'^services/aulas/all/$',views.getAula, name='aula-all'),
+    url(r'^services/aulas/(?P<id_aula>(\d+))/$',views.detAula, name='aula-det'),
+    url(r'^services/aulas/unable/(?P<id_aula>(\d+))/$',views.unableAula, name='aula-unable'),
+    ##ciclo
+    url(r'^services/ciclos/$',views.regCiclo, name='ciclo-create'),
+    ##programa
+    url(r'^services/programas/$',views.regPrograma, name='programa-create'),
+    url(r'^services/programas/all/$',views.getPrograma, name='programa-all'),
+    url(r'^services/programas/(?P<id_programa>(\d+))/$',views.detPrograma, name='programa-det'),
+    url(r'^services/programas/unable/(?P<id_programa>(\d+))/$',views.unablePrograma, name='programa-unable'),
+    ##materia
+    url(r'^services/materias/$',views.regMateria, name='materia-create'),
+    url(r'^services/materias/all/$',views.getMateria, name='materia-all'),
+    url(r'^services/materias/(?P<id_materia>(\d+))/$',views.detMateria, name='materia-det'),
+    url(r'^services/materias/unable/(?P<id_materia>(\d+))/$',views.unableMateria, name='materia-unable'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

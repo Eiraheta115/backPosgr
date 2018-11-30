@@ -8,7 +8,7 @@ from .serializers import UserSerializer, ImgSerializer,RolUsuariosSerializer,Pas
 from rest_framework import status, viewsets, generics, mixins
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import  Noticia, Aspirante,Image, Docente, Pasos ,Procedimiento, Cita, Validacion
+from .models import  Noticia, Aspirante,Image, Docente, Pasos ,Procedimiento, Cita, Validacion, Programa, ciclo, Materia, aula, horario
 from rest_framework.authtoken.models import Token
 import json,time, random, requests, hashlib, calendar, datetime
 
@@ -734,3 +734,321 @@ def regApirante(request):
         content = {"msj": "usuario ya existe"}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regHorario(request):
+    data = json.loads(request.body)
+    codigo= data["codigo"]
+    horaInicio = datetime.datetime.strptime(data["horaInicio"], "%H:%M:%S")
+    horaFIn = datetime.datetime.strptime(data["horaFIn"], "%H:%M:%S")
+    h= horario.objects.create(codigo=codigo, hora_inicio=horaInicio, hora_fin=horaFIn, activo=True)
+    content = {'guardado': True}
+    return Response(content, status=status.HTTP_201_CREATED)
+   
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getHorario(request):
+    data=[]
+    horarios=horario.objects.filter(activo=True)
+    for h in horarios:
+        json={
+            'id': h.id_horario,
+            'codigo': h.codigo,
+            'horaInicio':h.hora_inicio,
+            'horaFin': h.hora_fin
+        }
+        data.append(json)
+    content = {"horarios": data}
+    return Response(content, status=status.HTTP_200_OK)
+  
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unableHorario(request, id_horario):
+    try:
+        h= horario.objects.get(id_horario=id_horario)
+        h.activo=False
+        h.save()
+        content = {'editato': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except horario.DoesNotExist:
+        content = {'Horario no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regAula(request):
+    data = json.loads(request.body)
+    codigo= data["codigo"]
+    ubicacion = data["ubicacion"]
+    a= aula.objects.create(codigo=codigo, ubicacion=ubicacion, activo=True)
+    content = {'guardado': True}
+    return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detAula(request, id_aula):
+    try:
+        a= aula.objects.get(id_aula=id_aula)
+        json={
+            'id': a.id_aula,
+            'codigo': a.codigo,
+            'ubicacion':a.ubicacion
+        }
+        content = {'aula': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except aula.DoesNotExist:
+        content = {'aula no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getAula(request):
+    data=[]
+    aulas=aula.objects.filter(activo=True)
+    for a in aulas:
+        json={
+            'id': a.id_aula,
+            'codigo': a.codigo,
+            'ubicacion':a.ubicacion
+        }
+        data.append(json)
+    content = {"aulas": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unableAula(request, id_aula):
+    try:
+        a= aula.objects.get(id_aula=id_aula)
+        a.activo=False
+        a.save()
+        content = {'editado': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except aula.DoesNotExist:
+        content = {'aula no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regCiclo(request):
+    data = json.loads(request.body)
+    numero= data["numero"]
+    anio = data["anio"]
+    a= ciclo.objects.create(numero=numero, anio=anio, activo=True)
+    content = {'guardado': True}
+    return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regPrograma(request):
+    errores=[]
+    bandera=False
+    data = json.loads(request.body)
+    codigo= data["codigo"]
+    nombre= data["nombre"]
+    descripcion= data["descripcion"]
+    totalUV= data["totalUV"]
+    plan_estudio= data["plan_estudio"]
+    duracion_ciclo= data["duracion_ciclo"]
+    duracion_anio= data["duracion_anio"]
+    titulo= data["titulo"]
+    total_asignaturas= data["total_asignaturas"]
+    nota_minima= data["nota_minima"]
+    cum_minimo= data["cum_minimo"]
+    caracteristicas= data["caracteristicas"]
+
+    if totalUV<0:
+        errores.append("El total de UV no puede ser negativo")
+        bandera=True
+    if duracion_ciclo<0:
+        errores.append("La duracion del ciclo no puede ser negativa")
+        bandera=True
+    if plan_estudio<0:
+        errores.append("El plan de estudio del ciclo no puede ser negativo")
+        bandera=True
+    if duracion_anio<0:
+        errores.append("La duración en año del ciclo no puede ser negativa")
+        bandera=True
+    if total_asignaturas<0:
+        errores.append("El total de asignaturas no puede ser negativo")
+        bandera=True
+    if nota_minima<0.0:
+        errores.append("La nota minima no puede ser negativa")
+        bandera=True
+    if cum_minimo<0.0:
+        errores.append("El cum minima no puede ser negativo")
+        bandera=True
+    
+    if bandera==True:
+        content = {'errores': errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        p=Programa.objects.create(codigo=codigo,
+        nombre=nombre,
+        descripcion=descripcion,
+        totalUV=totalUV,
+        plan_estudio=plan_estudio,
+        duracion_ciclo=duracion_ciclo,
+        duracion_anio=duracion_anio,
+        titulo=titulo,
+        total_asignaturas=total_asignaturas,
+        nota_minima=nota_minima,
+        cum_minimo=cum_minimo,
+        caracteristicas=caracteristicas,
+        activo=True)
+        content = {'guardado': True}
+        return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getPrograma(request):
+    data=[]
+    programas=Programa.objects.filter(activo=True)
+    for p in programas:
+        json={
+            'codigo':p.codigo,
+            'nombre':p.nombre,
+            'totalUV':p.totalUV,
+            'plan_estudio':p.plan_estudio,
+            'duracion_ciclo':p.duracion_ciclo
+        }
+        data.append(json)
+    content = {"programas": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detPrograma(request, id_programa):
+    try:
+        p= Programa.objects.get(id_programa=id_programa)
+        json={
+            'codigo':p.codigo,
+            'nombre':p.nombre,
+            'totalUV':p.totalUV,
+            'plan_estudio':p.plan_estudio,
+            'duracion_ciclo':p.duracion_ciclo
+        }
+        content = {'programa': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except Programa.DoesNotExist:
+        content = {'programa no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unablePrograma(request, id_programa):
+    try:
+        p= Programa.objects.get(id_programa=id_programa)
+        p.activo=False
+        p.save()
+        content = {'editado': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except Programa.DoesNotExist:
+        content = {'programa no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regMateria(request):
+    errores=[]
+    bandera=False
+    data = json.loads(request.body)
+    idPre= data["prerequisito"]
+    idCiclo = data["ciclo"]
+    codigo= data["codigo"]
+    nombre= data["nombre"]
+    correlativo= data["correlativo"]
+    unidad_valorativa= data["unidad_valorativa"]
+
+    if idPre =="":
+        prerequisito=None
+    else:
+        try:
+            prerequisito= Materia.objects.get(id_materia=idPre)
+        except Materia.DoesNotExist:
+            errores.append("materia prerequisito no encontrado")
+            bandera=True
+            prerequisito=None
+    
+    try:
+        c= ciclo.objects.get(id_ciclo=idCiclo)
+    except ciclo.DoesNotExist:
+        errores.append("ciclo no encontrado")
+        bandera=True
+        c=""
+
+    if correlativo<0:
+        errores.append("El correlativo no puede ser negativo")
+        bandera=True
+    
+    if unidad_valorativa<0.0:
+        errores.append("La unidad valorativo no puede ser negativa")
+        bandera=True
+
+    if bandera==True:
+        content = {'errores': errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        m=Materia.objects.create(codigo=codigo,
+        nombre=nombre,
+        correlativo=correlativo,
+        id_materia_pre=prerequisito,
+        id_ciclo=c,
+        unidad_valorativa=unidad_valorativa,
+        activo=True)
+        content = {'guardado': True}
+        return Response(content, status=status.HTTP_201_CREATED)
+
+    a= ciclo.objects.create(numero=numero, anio=anio, activo=True)
+    content = {'guardado': True}
+    return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getMateria(request):
+    data=[]
+    materias=Materia.objects.filter(activo=True)
+    for m in materias:
+        json={
+            'codigo':m.codigo,
+            'nombre':m.nombre,
+            'ciclo':m.id_ciclo.id_ciclo,
+          #  'prerequisito':m.id_materia_pre,
+            'unidadValorativa':m.unidad_valorativa,
+            'correlativo':m.correlativo
+        }
+        data.append(json)
+    content = {"materias": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detMateria(request, id_materia):
+    try:
+        m= Materia.objects.get(id_materia=id_materia)
+        json={
+            'codigo':m.codigo,
+            'nombre':m.nombre,
+            'ciclo':m.id_ciclo.id_ciclo,
+          #  'prerequisito':m.id_materia_pre,
+            'unidadValorativa':m.unidad_valorativa,
+            'correlativo':m.correlativo
+        }
+        content = {'materias': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except Materia.DoesNotExist:
+        content = {'materia no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unableMateria(request, id_materia):
+    try:
+        m= Materia.objects.get(id_materia=id_materia)
+        m.activo=False
+        m.save()
+        content = {'editado': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except Materia.DoesNotExist:
+        content = {'materia no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
