@@ -57,6 +57,9 @@ urlpatterns = [
     url(r'^services/aulas/unable/(?P<id_aula>(\d+))/$',views.unableAula, name='aula-unable'),
     ##ciclo
     url(r'^services/ciclos/$',views.regCiclo, name='ciclo-create'),
+    url(r'^services/ciclos/all/$',views.getCiclo, name='ciclo-all'),
+    url(r'^services/ciclos/(?P<id_ciclo>(\d+))/$',views.detCiclo, name='ciclo-det'),
+    url(r'^services/ciclos/unable/(?P<id_ciclo>(\d+))/$',views.unableCiclo, name='ciclo-unable'),
     ##programa
     url(r'^services/programas/$',views.regPrograma, name='programa-create'),
     url(r'^services/programas/all/$',views.getPrograma, name='programa-all'),

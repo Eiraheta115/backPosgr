@@ -838,6 +838,50 @@ def regCiclo(request):
     content = {'guardado': True}
     return Response(content, status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getCiclo(request):
+    data=[]
+    ciclos=ciclo.objects.filter(activo=True)
+    for a in ciclos:
+        json={
+            'id': a.id_ciclo,
+            'numero': a.numero,
+            'anio':a.anio
+        }
+        data.append(json)
+    content = {"ciclos": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detCiclo(request, id_ciclo):
+    try:
+        a= ciclo.objects.get(id_ciclo=id_ciclo)
+        json={
+            'id': a.id_ciclo,
+            'numero': a.numero,
+            'anio':a.anio
+        }
+        content = {'ciclo': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except ciclo.DoesNotExist:
+        content = {'ciclo no encontrad0'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unableCiclo(request, id_ciclo):
+    try:
+        a= ciclo.objects.get(id_ciclo=id_ciclo)
+        a.activo=False
+        a.save()
+        content = {'editado': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except ciclo.DoesNotExist:
+        content = {'ciclo no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 def regPrograma(request):
