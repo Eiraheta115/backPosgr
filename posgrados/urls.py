@@ -46,6 +46,27 @@ urlpatterns = [
     url(r'^services/pasos/$',views.Pasosnuevos, name='pasos-create'),
     url(r'^services/procedimiento/(?P<id_procedimiento>(\d+))/$',views.ProcedimientoApiCreateRetrive.as_view(), name='procedimiento-create'),
     url(r'^services/aspirante/v2/$',views.regApirante, name='reg-aspv2'),
+    url(r'^services/pregunta/$',views.PreguntaApiCreate.as_view(), name='pregunta-create'),
+    url(r'^services/pregunta/(?P<id_pregunta>(\d+))/$',views.PreguntaApiCreateRetrive.as_view(), name='pregunta-retrive'),
+    url(r'^services/encuestas/$',views.EncuestanApiCreate.as_view(), name='encuesta-create'),
+    url(r'^services/encuestas/(?P<id_encuensta>(\d+))/$',views.EncuestaApiCreateRetrive.as_view(), name='encuesta-retrive'),
+    ## Documentos
+    url(r'^services/documentos/$',views.regDocumento, name='documentos-create'),
+    url(r'^services/documentos/all/$',views.getDocumento, name='documentos-all'),
+    url(r'^services/documentos/(?P<id_documento>(\d+))/$',views.detDocumento, name='documento-update'),
+    ##Clasificacion
+    url(r'^services/clasificaciones/$',views.regClasificacion, name='clasificaciones-create'),
+    url(r'^services/clasificaciones/all/$',views.getClasificacion, name='clasificaciones-all'),
+    url(r'^services/clasificaciones/(?P<id_clasificacion>(\d+))/$',views.detClasificacion, name='clasificaciones-update'),
+    ##categorias
+    url(r'^services/categorias/$',views.regCategoria, name='categorias-create'),
+    url(r'^services/categorias/all/$',views.getCategoria, name='categorias-all'),
+    url(r'^services/categorias/(?P<id_categoria>(\d+))/$',views.detCategoria, name='categorias-update'),
+    
+    url(r'^services/respuestas/$',views.RespuestaApiCreate.as_view(), name='respuestas-create'),
+    url(r'^services/respuestas/(?P<id_respuesta>(\d+))/$',views.RespuestaApiCreateRetrive.as_view(), name='respuestas-retrive'),
+    url(r'^services/clasificacion/$',views.ClasificacionApiCreate.as_view(), name='clasificacion-create'),
+    url(r'^services/clasificacion/(?P<id_clasificacion>(\d+))/$',views.ClasificacionApiCreateRetrive.as_view(), name='clasificacion-retrive'),
     ##horario
     url(r'^services/horarios/$',views.regHorario, name='horario-create'),
     url(r'^services/horarios/all/$',views.getHorario, name='horario-all'),

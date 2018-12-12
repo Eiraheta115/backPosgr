@@ -4,11 +4,11 @@ from django.conf import settings
 from rest_framework.permissions import IsAuthenticated , AllowAny
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.views import ObtainAuthToken
-from .serializers import UserSerializer, ImgSerializer,RolUsuariosSerializer,PasosSerializer,ProcedimientosSerializer,DocentesSerializer,User1Serializer, PermisionsMixinSerializer,  NoticiaSerializer, AspiranteSerializer, GroupSerializer, PermisionsSerializer
+from .serializers import UserSerializer,EncuestaSerializer,RespuestasSerializer,CategoriaSerializer, ImgSerializer,RolUsuariosSerializer,PasosSerializer,ProcedimientosSerializer,DocentesSerializer,User1Serializer, PermisionsMixinSerializer,  NoticiaSerializer, AspiranteSerializer, GroupSerializer, PermisionsSerializer,PreguntaSerializer,ClasificacionSerializer
 from rest_framework import status, viewsets, generics, mixins
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import  Noticia, Aspirante,Image, Docente, Pasos ,Procedimiento, Cita, Validacion, Programa, ciclo, Materia, aula, horario
+from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento
 from rest_framework.authtoken.models import Token
 import json,time, random, requests, hashlib, calendar, datetime
 
@@ -1095,4 +1095,208 @@ def unableMateria(request, id_materia):
         return Response(content, status=status.HTTP_200_OK)
     except Materia.DoesNotExist:
         content = {'materia no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+class PreguntaApiCreate( generics.ListCreateAPIView):
+    permission_classes=(AllowAny, )
+    lookup_field = 'id_pregunta'
+    serializer_class = PreguntaSerializer
+
+    def get_queryset(self):
+        return Pregunta.objects.all()
+
+
+class PreguntaApiCreateRetrive(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes=(AllowAny, )
+    lookup_field = 'id_pregunta'
+    serializer_class = PreguntaSerializer
+
+    def get_queryset(self):
+        return Pregunta.objects.all()
+
+
+class ClasificacionApiCreate( generics.ListCreateAPIView):
+    permission_classes=(AllowAny, )
+    lookup_field = 'id_clasificacion'
+    serializer_class = ClasificacionSerializer
+
+    def get_queryset(self):
+        return Clasificacion.objects.all()
+
+
+class ClasificacionApiCreateRetrive(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes=(AllowAny, )
+    lookup_field = 'id_clasificacion'
+    serializer_class = ClasificacionSerializer
+
+    def get_queryset(self):
+        return Clasificacion.objects.all()
+
+
+class EncuestanApiCreate( generics.ListCreateAPIView):
+    permission_classes=(AllowAny, )
+    lookup_field = 'id_encuensta'
+    serializer_class = EncuestaSerializer
+
+    def get_queryset(self):
+        return Encuentas.objects.all()
+
+
+class EncuestaApiCreateRetrive(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes=(AllowAny, )
+    lookup_field = 'id_encuensta'
+    serializer_class = EncuestaSerializer
+
+    def get_queryset(self):
+        return Encuentas.objects.all()
+
+
+class RespuestaApiCreate( generics.ListCreateAPIView):
+    permission_classes=(AllowAny, )
+    lookup_field = 'id_respuesta'
+    serializer_class = RespuestasSerializer
+
+    def get_queryset(self):
+        return Respuesta.objects.all()
+
+
+class RespuestaApiCreateRetrive(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes=(AllowAny, )
+    lookup_field = 'id_respuesta'
+    serializer_class = RespuestasSerializer
+
+    def get_queryset(self):
+        return Respuesta.objects.all()
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regDocumento(request):
+    data = json.loads(request.body)
+    nombre= data["nombre"]
+    entregado = data["entregado"]
+    a= Documento.objects.create(nombre=nombre, entregado=entregado)
+    content = {'guardado': True}
+    return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getDocumento(request):
+    data=[]
+    Documentos=Documento.objects.all()
+    for m in Documentos:
+        json={
+            'id_documento':m.id_documento,
+            'nombre': m.nombre,
+            'entregado':m.entregado
+        }
+        data.append(json)
+    content = {"documentos": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detDocumento(request, id_documento):
+    try:
+        m= Documento.objects.get(id_documento=id_documento)
+        json={
+            'nombre':m.nombre,
+            'entregado':m.entregado
+        }
+        content = {'Documento': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except Documento.DoesNotExist:
+        content = {'documento no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regClasificacion(request):
+    data = json.loads(request.body)
+    nombre= data["nombre"]
+    a= Clasificacion.objects.create(nombre=nombre)
+    content = {'guardado': True}
+    return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getClasificacion(request):
+    data=[]
+    Clasificaciones=Clasificacion.objects.all()
+    for m in Clasificaciones:
+        json={
+            'id_clasificacion': m.id_clasificacion,
+            'nombre':m.nombre
+        }
+        data.append(json)
+    content = {"Clasificaciones": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detClasificacion(request, id_clasificacion):
+    try:
+        m= Clasificacion.objects.get(id_clasificacion=id_clasificacion)
+        json={
+            'nombre':m.nombre
+        }
+        content = {'Clasificacion': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except Clasificacion.DoesNotExist:
+        content = {'Clasificacion no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regCategoria(request):
+    errores=[]
+    bandera=False
+    data = json.loads(request.body)
+    nombre= data["nombre"]
+    padre = data["padre"]
+
+    if padre =="":
+        padre=None
+    else:
+        try:
+            padre= Catergoria.objects.get(id_categoria=padre)
+        except Catergoria.DoesNotExist:
+            errores.append("clasificacion padre no encontrada")
+            bandera=True
+            padre=None
+
+    if bandera==True:
+        content = {'errores': errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        m=Catergoria.objects.create(nombre=nombre, padre=padre)
+        content = {'guardado': True}
+        return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getCategoria(request):
+    data=[]
+    categorias=Catergoria.objects.all()
+    for m in categorias:
+        json={
+            'id_categoria':m.id_categoria,
+            'nombre':m.nombre
+        }
+        data.append(json)
+    content = {"categorias": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detCategoria(request, id_categoria):
+    try:
+        m= Catergoria.objects.get(id_categoria=id_categoria)
+        json={
+            'id_categoria':m.id_categoria,
+            'nombre':m.nombre,
+        }
+        content = {'categorias': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except Catergoria.DoesNotExist:
+        content = {'categoria no encontrada'}
         return Response(content, status=status.HTTP_404_NOT_FOUND)

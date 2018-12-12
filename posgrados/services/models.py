@@ -169,3 +169,66 @@ class horario(models.Model):
     hora_inicio=models.TimeField()
     hora_fin=models.TimeField()
     activo=models.BooleanField(blank=True)
+
+class descuento(models.Model):
+    id_descuento=models.AutoField(primary_key=True)
+    nombre=models.CharField(max_length=256, blank=True, null=True)
+    descripcion=models.CharField(max_length=1024, blank=True, null=True)
+    activo=models.BooleanField(blank=True)
+
+class Clasificacion(models.Model):
+    id_clasificacion=models.AutoField(primary_key=True)
+    nombre=models.CharField(max_length=50)
+
+    def __str__(self):
+        return(self.nombre)
+
+
+class Pregunta(models.Model):
+    id_pregunta=models.AutoField(primary_key=True)
+    titulo=models.CharField(max_length=100)
+    tipo=models.ForeignKey('Clasificacion', models.SET_NULL, blank=True, null = True,)
+
+    def __str__(self):
+        return(self.id_pregunta)
+
+
+class Respuesta(models.Model):
+    id_respuesta=models.AutoField(primary_key=True)
+    id_pregunta=models.ForeignKey('Pregunta', models.SET_NULL, blank=True, null = True, )
+    valor=models.IntegerField()
+    comentario=models.CharField(max_length=750)
+    id_estudiante=models.ForeignKey('Aspirante', models.SET_NULL, blank=True, null = True,)
+    id_encuesta=models.ForeignKey('Encuentas', models.SET_NULL, blank=True, null = True,)
+
+    def __str__(self):
+        return(self.id_respuesta)
+
+
+class Documento(models.Model):
+    id_documento=models.AutoField(primary_key=True)
+    nombre=models.CharField(max_length=50)
+    entregado=models.BooleanField(default=False)
+
+    def __str__(self):
+        return(self.id_documento)
+
+
+class Encuentas(models.Model):
+    id_encuensta=models.AutoField(primary_key=True)
+    objetivo=models.CharField(max_length=1000)
+    instrucciones=models.CharField(max_length=15000)
+    fecha_inicio=models.DateField()
+    fecha_fin=models.DateField()
+    id_docente=models.ForeignKey('Docente', models.SET_NULL, blank=True, null = True,)
+
+    def __str__(self):
+        return(self.id_encuensta)
+
+class Catergoria(models.Model):
+    id_categoria=models.AutoField(primary_key=True)
+    nombre=models.CharField(max_length=50)
+    padre=models.ForeignKey('self', models.SET_NULL, blank=True, null=True,)
+
+    def __str__(self):
+        return (self.nombre)

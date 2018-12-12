@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group, Permission, PermissionsMixin
 from rest_framework import serializers
 
 
-from .models import  Noticia, Aspirante,Image, Docente, Procedimiento,Pasos, Validacion
+from .models import  Noticia, Aspirante,Image, Docente, Procedimiento,Pasos, Validacion, Pregunta, Clasificacion, Encuentas, Respuesta,Catergoria
 
 
 class RolUsuariosSerializer(serializers.HyperlinkedModelSerializer):
@@ -104,6 +104,32 @@ class ProcedimientosSerializer(serializers.ModelSerializer):
     class Meta:
         model = Procedimiento
         fields = '__all__'
+
+class PreguntaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Validacion
+        model = Pregunta
+        fields = '__all__'
+
+
+class ClasificacionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Clasificacion
+        fields = '__all__'
+
+
+class RespuestasSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Respuesta
+        fields = '__all__'
+
+
+class EncuestaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Encuentas
+        fields = '__all__'
+
+
+class CategoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Catergoria
         fields = '__all__'
