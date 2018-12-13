@@ -950,6 +950,7 @@ def getPrograma(request):
     programas=Programa.objects.filter(activo=True)
     for p in programas:
         json={
+            'id':p.id_programa,
             'codigo':p.codigo,
             'nombre':p.nombre,
             'totalUV':p.totalUV,
