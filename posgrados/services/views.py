@@ -1300,3 +1300,66 @@ def detCategoria(request, id_categoria):
     except Catergoria.DoesNotExist:
         content = {'categoria no encontrada'}
         return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regEncuesta(request):
+    errores=[]
+    bandera=False
+    data = json.loads(request.body)
+    objetivo= data["objetivo"]
+    instrucciones = data["instrucciones"]
+    fecha_inicio= datetime.datetime.strptime(data["fecha_inicio"], "%Y-%m-%d")
+    fecha_fin= datetime.datetime.strptime(data["fecha_fin"], "%Y-%m-%d")
+    id_docente= data["id_docente"]
+
+    try:
+        docente= Docente.objects.get(id_docente=id_docente)
+    except Docente.DoesNotExist:
+        errores.append("Docente no encontrado")
+        bandera=True
+
+    if fecha_fin < fecha_inicio:
+        errores.append("fecha fin no puede ser menor a fecha inicio")
+        bandera=True
+
+    if bandera==True:
+        content = {'errores': errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        m=Encuentas.objects.create(objetivo=objetivo, 
+        instrucciones=instrucciones,
+        fecha_inicio=fecha_inicio,
+        fecha_fin=fecha_fin,
+        id_docente=docente)
+        content = {'guardado': True}
+        return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getCategoria(request):
+    data=[]
+    categorias=Catergoria.objects.all()
+    for m in categorias:
+        json={
+            'id_categoria':m.id_categoria,
+            'nombre':m.nombre
+        }
+        data.append(json)
+    content = {"categorias": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detCategoria(request, id_categoria):
+    try:
+        m= Catergoria.objects.get(id_categoria=id_categoria)
+        json={
+            'id_categoria':m.id_categoria,
+            'nombre':m.nombre,
+        }
+        content = {'categorias': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except Catergoria.DoesNotExist:
+        content = {'categoria no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)

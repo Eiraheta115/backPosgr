@@ -62,6 +62,10 @@ urlpatterns = [
     url(r'^services/categorias/$',views.regCategoria, name='categorias-create'),
     url(r'^services/categorias/all/$',views.getCategoria, name='categorias-all'),
     url(r'^services/categorias/(?P<id_categoria>(\d+))/$',views.detCategoria, name='categorias-update'),
+    ##Encuestas
+    url(r'^services/encuestas/$',views.regEncuesta, name='encuestas-create'),
+    url(r'^services/encuestas/all/$',views.getCategoria, name='encuestas-all'),
+    url(r'^services/encuestas/(?P<id_categoria>(\d+))/$',views.detCategoria, name='encuestas-update'),
     
     url(r'^services/respuestas/$',views.RespuestaApiCreate.as_view(), name='respuestas-create'),
     url(r'^services/respuestas/(?P<id_respuesta>(\d+))/$',views.RespuestaApiCreateRetrive.as_view(), name='respuestas-retrive'),
