@@ -1055,10 +1055,11 @@ def getMateria(request):
     materias=Materia.objects.filter(activo=True)
     for m in materias:
         json={
+            'id': m.id_materia,
             'codigo':m.codigo,
             'nombre':m.nombre,
             'ciclo':m.id_ciclo.id_ciclo,
-          #  'prerequisito':m.id_materia_pre,
+            'prerequisito':m.id_materia_pre_id,
             'unidadValorativa':m.unidad_valorativa,
             'correlativo':m.correlativo
         }
@@ -1075,7 +1076,7 @@ def detMateria(request, id_materia):
             'codigo':m.codigo,
             'nombre':m.nombre,
             'ciclo':m.id_ciclo.id_ciclo,
-          #  'prerequisito':m.id_materia_pre,
+            'prerequisito':m.id_materia_pre_id,
             'unidadValorativa':m.unidad_valorativa,
             'correlativo':m.correlativo
         }
