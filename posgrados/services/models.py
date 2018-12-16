@@ -144,6 +144,7 @@ class ciclo (models.Model):
 class Materia(models.Model):
     id_materia=models.AutoField(primary_key=True)
     id_materia_pre= models.ForeignKey('self', null=True, on_delete=models.CASCADE)
+    id_programa= models.ForeignKey(Programa, models.SET_NULL, blank=True, null=True)
     id_ciclo= models.ForeignKey(ciclo, models.SET_NULL, blank=True, null=True)
     codigo=models.CharField(max_length=10)
     nombre=models.CharField(max_length=150)
@@ -183,7 +184,6 @@ class Clasificacion(models.Model):
     def __str__(self):
         return(self.nombre)
 
-
 class Pregunta(models.Model):
     id_pregunta=models.AutoField(primary_key=True)
     titulo=models.CharField(max_length=100)
@@ -191,7 +191,6 @@ class Pregunta(models.Model):
 
     def __str__(self):
         return(self.id_pregunta)
-
 
 class Respuesta(models.Model):
     id_respuesta=models.AutoField(primary_key=True)
@@ -204,7 +203,6 @@ class Respuesta(models.Model):
     def __str__(self):
         return(self.id_respuesta)
 
-
 class Documento(models.Model):
     id_documento=models.AutoField(primary_key=True)
     nombre=models.CharField(max_length=50)
@@ -212,7 +210,6 @@ class Documento(models.Model):
 
     def __str__(self):
         return(self.id_documento)
-
 
 class Encuentas(models.Model):
     id_encuensta=models.AutoField(primary_key=True)

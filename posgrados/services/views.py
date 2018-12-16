@@ -1004,7 +1004,7 @@ def regMateria(request):
     nombre= data["nombre"]
     correlativo= data["correlativo"]
     unidad_valorativa= data["unidad_valorativa"]
-
+    id_programa= data["id_programa"]
     if idPre =="":
         prerequisito=None
     else:
@@ -1021,6 +1021,12 @@ def regMateria(request):
         errores.append("ciclo no encontrado")
         bandera=True
         c=""
+    try:
+        p= Programa.objects.get(id_programa=id_programa)
+    except ciclo.DoesNotExist:
+        errores.append("programa no encontrado")
+        bandera=True
+        p=""
 
     if correlativo<0:
         errores.append("El correlativo no puede ser negativo")
@@ -1038,6 +1044,7 @@ def regMateria(request):
         nombre=nombre,
         correlativo=correlativo,
         id_materia_pre=prerequisito,
+        id_programa=p,
         id_ciclo=c,
         unidad_valorativa=unidad_valorativa,
         activo=True)
@@ -1058,10 +1065,15 @@ def getMateria(request):
             prerrequisito=""
         else:
             prerrequisito=m.id_materia_pre.codigo
+        if m.id_programa_id is None:
+            programa=""
+        else:
+            programa=m.id_programa.nombre
         json={
             'id': m.id_materia,
             'codigo':m.codigo,
             'nombre':m.nombre,
+            'programa':programa,
             'ciclo':m.id_ciclo.id_ciclo,
             'prerequisito':prerrequisito,
             'unidadValorativa':m.unidad_valorativa,
@@ -1082,10 +1094,15 @@ def detMateria(request, id_materia):
         else:
             prerrequisitoCodigo=m.id_materia_pre.codigo
             prerrequisitoNombre=m.id_materia_pre.nombre
+        if m.id_programa_id is None:
+            programa=""
+        else:
+            programa=m.id_programa.nombre
         json={
             'id': m.id_materia,
             'codigo':m.codigo,
             'nombre':m.nombre,
+            'programa':programa,
             'ciclo':m.id_ciclo.id_ciclo,
             'prerequisitoNombre':prerrequisitoNombre,
             'prerrequisitoCodigo':prerrequisitoCodigo,
