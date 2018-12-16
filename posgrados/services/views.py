@@ -1054,12 +1054,16 @@ def getMateria(request):
     data=[]
     materias=Materia.objects.filter(activo=True)
     for m in materias:
+        if m.id_materia_pre_id is None:
+            prerrequisito=""
+        else:
+            prerrequisito=m.id_materia_pre.codigo
         json={
             'id': m.id_materia,
             'codigo':m.codigo,
             'nombre':m.nombre,
             'ciclo':m.id_ciclo.id_ciclo,
-            'prerequisito':m.id_materia_pre_id,
+            'prerequisito':prerrequisito,
             'unidadValorativa':m.unidad_valorativa,
             'correlativo':m.correlativo
         }
