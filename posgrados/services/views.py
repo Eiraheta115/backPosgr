@@ -1076,11 +1076,16 @@ def getMateria(request):
 def detMateria(request, id_materia):
     try:
         m= Materia.objects.get(id_materia=id_materia)
+        if m.id_materia_pre_id is None:
+            prerrequisito=""
+        else:
+            prerrequisito=m.id_materia_pre.codigo
         json={
+            'id': m.id_materia,
             'codigo':m.codigo,
             'nombre':m.nombre,
             'ciclo':m.id_ciclo.id_ciclo,
-            'prerequisito':m.id_materia_pre_id,
+            'prerequisito':prerrequisito,
             'unidadValorativa':m.unidad_valorativa,
             'correlativo':m.correlativo
         }
