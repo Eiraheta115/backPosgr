@@ -229,3 +229,14 @@ class Catergoria(models.Model):
 
     def __str__(self):
         return (self.nombre)
+
+class grupoTeorico(models.Model):
+    id_grupo=models.AutoField(primary_key=True)
+    id_programa=models.ForeignKey('Programa', models.SET_NULL, blank=True, null = True,)
+    id_ciclo=models.ForeignKey('ciclo', models.SET_NULL, blank=True, null = True,)
+    id_aula=models.ForeignKey('aula', models.SET_NULL, blank=True, null = True,)
+    id_horario=models.ForeignKey('horario', models.SET_NULL, blank=True, null = True,)
+    id_materia=models.ForeignKey('Materia', models.SET_NULL, blank=True, null = True,)
+    id_docente=models.ForeignKey('Docente', models.SET_NULL, blank=True, null = True,)
+    cupo=models.IntegerField()
+    activo=models.BooleanField()

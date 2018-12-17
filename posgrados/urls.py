@@ -95,4 +95,6 @@ urlpatterns = [
     url(r'^services/materias/all/$',views.getMateria, name='materia-all'),
     url(r'^services/materias/(?P<id_materia>(\d+))/$',views.detMateria, name='materia-det'),
     url(r'^services/materias/unable/(?P<id_materia>(\d+))/$',views.unableMateria, name='materia-unable'),
+    ##grupoTeorico
+    url(r'^services/gruposT/$',views.regGrupoT, name='grupoT-create'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -8,7 +8,7 @@ from .serializers import UserSerializer,EncuestaSerializer,RespuestasSerializer,
 from rest_framework import status, viewsets, generics, mixins
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento
+from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento, grupoTeorico
 from rest_framework.authtoken.models import Token
 import json,time, random, requests, hashlib, calendar, datetime
 
@@ -1394,3 +1394,105 @@ def detCategoria(request, id_categoria):
     except Catergoria.DoesNotExist:
         content = {'categoria no encontrada'}
         return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regGrupoT(request):
+    global numero
+    numero=1
+    errores=[]
+    exitos=[]
+    global bandera
+    bandera=False
+    data = json.loads(request.body)
+    idCiclo= data["idCiclo"]
+    idPrograma= data["idPrograma"]
+    grupos=data["grupos"]
+    idMateria=  data["idMateria"]
+
+    try:
+        programa= Programa.objects.get(id_programa=idPrograma)
+    except Programa.DoesNotExist:
+        errores.append("Programa no encontrado")
+        bandera=True
+
+    try:
+        Ciclo= ciclo.objects.get(id_ciclo=idCiclo)
+        if Ciclo.activo==False:
+            errores.append("El ciclo debe ser activo")
+            bandera=True    
+    except ciclo.DoesNotExist:
+        errores.append("Ciclo no encontrado")
+        bandera=True
+    
+    try:
+        materia= Materia.objects.get(id_materia=idMateria)
+        if materia.activo==False:
+            errores.append("La materia debe ser activo")
+            bandera=True
+    except Materia.DoesNotExist:
+        errores.append("Materia no encontrada")
+    
+    for g in data["grupos"]:
+        bandera=False
+        idAula = g["idAula"]
+        idHorario=  g["idHorario"]
+        idDocente= g["idDocente"]
+        cupo= g["cupo"]
+
+        try:
+            Aula= aula.objects.get(id_aula=idAula)
+            if Aula.activo==False:
+                errores.append("Grupo:"+ str(numero)+ " La aula debe ser activo")
+                bandera=True
+        except aula.DoesNotExist:
+            errores.append("Grupo:"+ str(numero)+ " Aula no encontrada")
+            bandera=True
+    
+        try:
+            Horario= horario.objects.get(id_horario=idHorario)
+            if Horario.activo==False:
+                errores.append("Grupo:"+ str(numero)+ " El horario debe ser activo")
+                bandera=True
+        except horario.DoesNotExist:
+            errores.append("Grupo:"+ str(numero)+ " Horario no encontrado")
+            bandera=True
+            bandera=True
+    
+        try:
+            docente= Docente.objects.get(id_docente=idDocente)
+        except Docente.DoesNotExist:
+            errores.append("Grupo:"+ str(numero)+ " Docente no encontrado")
+            bandera=True
+
+        if cupo <1:
+            errores.append("Grupo:"+ str(numero)+ " La cantidad de cupos no puede ser negativa ni cero")
+            bandera=True
+
+        if bandera==True:
+            numero=numero+1
+            continue
+        else:
+            m=grupoTeorico.objects.get_or_create(id_ciclo=Ciclo, 
+            id_programa=programa,
+            id_aula=Aula,
+            id_horario=Horario,
+            id_materia=materia,
+            id_docente=docente,
+            cupo=cupo,
+            activo=True,
+            defaults={'id_ciclo':Ciclo, 
+            'id_programa':programa,
+            'id_aula':Aula, 
+            'id_horario':Horario, 
+            'id_materia':materia,
+            'id_docente':docente})
+
+            if (m[1]==False):
+                errores.append("Grupo:"+ str(numero)+ " Hay un GT que conflictua con sus esoecificaciones")
+                numero=numero+1
+            else:
+                exitos.append("Grupo:"+ str(numero)+ " guardado exitosamente")
+                numero=numero+1
+    content={ "exitos":exitos, "errores": errores}
+    return Response(content, status=status.HTTP_202_ACCEPTED)
