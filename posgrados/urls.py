@@ -97,4 +97,6 @@ urlpatterns = [
     url(r'^services/materias/unable/(?P<id_materia>(\d+))/$',views.unableMateria, name='materia-unable'),
     ##grupoTeorico
     url(r'^services/gruposT/$',views.regGrupoT, name='grupoT-create'),
+    ##Inscripcion
+    url(r'^services/inscripciones/$',views.regInscripcion, name='ins-create'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

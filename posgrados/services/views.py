@@ -8,7 +8,7 @@ from .serializers import UserSerializer,EncuestaSerializer,RespuestasSerializer,
 from rest_framework import status, viewsets, generics, mixins
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento, grupoTeorico
+from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento, grupoTeorico, inscripcion
 from rest_framework.authtoken.models import Token
 import json,time, random, requests, hashlib, calendar, datetime
 
@@ -1436,7 +1436,22 @@ def regGrupoT(request):
         idHorario=  g["idHorario"]
         idDocente= g["idDocente"]
         cupo= g["cupo"]
-
+        L=M=X=J=V=S=D=False
+        for m in g["multiple"]:
+            if m =="Lunes":
+                L=True
+            if m =="Martes":
+                M=True
+            if m =="Miercoles":
+                X=True
+            if m =="Jueves":
+                J=True
+            if m =="Viernes":
+                V=True
+            if m =="Sabado":
+                S=True
+            if m =="Domingo":
+                D=True    
         try:
             Aula= aula.objects.get(id_aula=idAula)
             if Aula.activo==False:
@@ -1477,13 +1492,27 @@ def regGrupoT(request):
             id_materia=materia,
             id_docente=docente,
             cupo=cupo,
+            L=L,
+            M=M,
+            X=X,
+            J=J,
+            V=V,
+            S=S,
+            D=D,
             activo=True,
             defaults={'id_ciclo':Ciclo, 
             'id_programa':programa,
             'id_aula':Aula, 
             'id_horario':Horario, 
             'id_materia':materia,
-            'id_docente':docente})
+            'id_docente':docente,
+            'L':L,
+            'M':M,
+            'X':X,
+            'J':J,
+            'V':V,
+            'S':S,
+            'D':D})
 
             if (m[1]==False):
                 errores.append("Grupo:"+ str(numero)+ " Hay un GT que conflictua con sus esoecificaciones")
@@ -1493,3 +1522,41 @@ def regGrupoT(request):
                 numero=numero+1
     content={ "exitos":exitos, "errores": errores}
     return Response(content, status=status.HTTP_202_ACCEPTED)
+
+@api_view(['POST']) 
+@permission_classes((AllowAny,))   
+def regInscripcion(request):
+    errores=[]
+    bandera=False
+    data = json.loads(request.body)
+    idCiclo= data["idCiclo"]
+    nombre= data["nombre"]
+    dia=datetime.datetime.strptime(data["dia"], "%Y-%m-%d") 
+    hora_inicio= datetime.datetime.strptime(data["horaInicio"], "%H:%M:%S")
+    hora_fin= datetime.datetime.strptime(data["horaFin"], "%H:%M:%S")
+
+    if hora_inicio > hora_fin:
+        errores.append("hora fin no puede ser menor a hora inicio")
+        bandera=True
+
+    try:
+        Ciclo= ciclo.objects.get(id_ciclo=idCiclo)
+        if Ciclo.activo==False:
+            errores.append("El ciclo debe ser activo")
+            bandera=True    
+    except ciclo.DoesNotExist:
+        errores.append("Ciclo no encontrado")
+        bandera=True
+    
+    if bandera==True:
+        content = {'errores': errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        m=inscripcion.objects.create(nombre=nombre, 
+        id_ciclo=Ciclo,
+        dia=dia,
+        hora_inicio=hora_inicio,
+        hora_fin=hora_fin,
+        activo=True)
+        content = {'guardado': True}
+        return Response(content, status=status.HTTP_201_CREATED)
