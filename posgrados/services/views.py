@@ -999,7 +999,7 @@ def regMateria(request):
     bandera=False
     data = json.loads(request.body)
     idPre= data["prerequisito"]
-    idCiclo = data["ciclo"]
+    Ciclo = data["ciclo"]
     codigo= data["codigo"]
     nombre= data["nombre"]
     correlativo= data["correlativo"]
@@ -1016,14 +1016,11 @@ def regMateria(request):
             prerequisito=None
     
     try:
-        c= ciclo.objects.get(id_ciclo=idCiclo)
-    except ciclo.DoesNotExist:
-        errores.append("ciclo no encontrado")
-        bandera=True
-        c=""
-    try:
         p= Programa.objects.get(id_programa=id_programa)
-    except ciclo.DoesNotExist:
+        if Ciclo>p.duracion_ciclo:
+            errores.append("el ciclo se sale del rango valido para el programa")
+            bandera=True
+    except Programa.DoesNotExist:
         errores.append("programa no encontrado")
         bandera=True
         p=""
@@ -1045,7 +1042,7 @@ def regMateria(request):
         correlativo=correlativo,
         id_materia_pre=prerequisito,
         id_programa=p,
-        id_ciclo=c,
+        ciclo=Ciclo,
         unidad_valorativa=unidad_valorativa,
         activo=True)
         content = {'guardado': True}
@@ -1074,7 +1071,7 @@ def getMateria(request):
             'codigo':m.codigo,
             'nombre':m.nombre,
             'programa':programa,
-            'ciclo':m.id_ciclo.id_ciclo,
+            'ciclo':m.ciclo,
             'prerequisito':prerrequisito,
             'unidadValorativa':m.unidad_valorativa,
             'correlativo':m.correlativo
@@ -1103,7 +1100,7 @@ def detMateria(request, id_materia):
             'codigo':m.codigo,
             'nombre':m.nombre,
             'programa':programa,
-            'ciclo':m.id_ciclo.id_ciclo,
+            'ciclo':m.ciclo,
             'prerequisitoNombre':prerrequisitoNombre,
             'prerrequisitoCodigo':prerrequisitoCodigo,
             'unidadValorativa':m.unidad_valorativa,

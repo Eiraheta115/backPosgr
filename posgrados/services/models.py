@@ -145,7 +145,7 @@ class Materia(models.Model):
     id_materia=models.AutoField(primary_key=True)
     id_materia_pre= models.ForeignKey('self', null=True, on_delete=models.CASCADE)
     id_programa= models.ForeignKey(Programa, models.SET_NULL, blank=True, null=True)
-    id_ciclo= models.ForeignKey(ciclo, models.SET_NULL, blank=True, null=True)
+    ciclo= models.IntegerField(blank=True, null=True)
     codigo=models.CharField(max_length=10)
     nombre=models.CharField(max_length=150)
     correlativo=models.IntegerField()
