@@ -99,4 +99,6 @@ urlpatterns = [
     url(r'^services/gruposT/$',views.regGrupoT, name='grupoT-create'),
     ##Inscripcion
     url(r'^services/inscripciones/$',views.regInscripcion, name='ins-create'),
+    url(r'^services/inscripciones/all/$',views.getInscripcion, name='ins-all'),
+    url(r'^services/inscripciones/unable/(?P<id_inscripcion>(\d+))/$',views.unableInscripcion, name='ins-unable'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

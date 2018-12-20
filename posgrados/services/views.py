@@ -1560,3 +1560,35 @@ def regInscripcion(request):
         activo=True)
         content = {'guardado': True}
         return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getInscripcion(request):
+    data=[]
+    inscripciones=inscripcion.objects.filter(activo=True)
+    for m in inscripciones:
+        
+        json={
+            'id': m.id_inscripcion,
+            'nombre':m.nombre,
+            'ciclo':str(m.id_ciclo.numero) + " "+str(m.id_ciclo.anio),
+            'dia':m.dia,
+            'horaInicio':m.hora_inicio,
+            'horaFin':m.hora_fin
+        }
+        data.append(json)
+    content = {"inscripciones": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unableInscripcion(request, id_inscripcion):
+    try:
+        m= inscripcion.objects.get(id_inscripcion=id_inscripcion)
+        m.activo=False
+        m.save()
+        content = {'editado': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except inscripcion.DoesNotExist:
+        content = {'inscripcion no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
