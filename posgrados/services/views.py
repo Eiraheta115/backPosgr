@@ -1597,3 +1597,9 @@ def unableInscripcion(request, id_inscripcion):
     except inscripcion.DoesNotExist:
         content = {'inscripcion no encontrada'}
         return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def greetings(request):
+    content = {"msj": "Hi humans! don't panic we are posgrados cchh ;)"}
+    return Response(content, status=status.HTTP_200_OK)

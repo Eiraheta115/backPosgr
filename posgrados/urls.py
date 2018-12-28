@@ -12,6 +12,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^services/$', views.greetings, name='greetings'),
     url(r'^services/usuarios/(?P<id>(\d+))/$', views.Usuario2APICreateView.as_view(), name='usuario-create'),
     url(r'^services/asignaroless/(?P<id>(\d+))/usuario/(?P<id2>(\d+))/$', views.asignarrol, name='roles-usuarios'),
     url(r'^services/roles/$', views.GroupAPICreateView.as_view(), name='roles-create'),
