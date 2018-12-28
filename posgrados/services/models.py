@@ -246,13 +246,13 @@ class grupoTeorico(models.Model):
     S=models.BooleanField()
     D=models.BooleanField()
     cupo=models.IntegerField()
+    numero_grupo=models.IntegerField( models.SET_NULL, blank=True, null = True,)
     activo=models.BooleanField()
 
 class inscripcion(models.Model):
     id_inscripcion=models.AutoField(primary_key=True)
     nombre=models.CharField(max_length=50)
     id_ciclo=models.ForeignKey('ciclo', models.SET_NULL, blank=True, null = True,)
-    dia=models.DateField()
-    hora_inicio=models.TimeField()
-    hora_fin=models.TimeField()
+    fecha_inicio=models.DateTimeField()
+    fecha_fin=models.DateTimeField()
     activo=models.BooleanField()

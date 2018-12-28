@@ -1432,6 +1432,7 @@ def regGrupoT(request):
     
     for g in data["grupos"]:
         bandera=False
+        numeroGrupo= g["numeroGrupo"]
         idAula = g["idAula"]
         idHorario=  g["idHorario"]
         idDocente= g["idDocente"]
@@ -1481,6 +1482,10 @@ def regGrupoT(request):
             errores.append("Grupo:"+ str(numero)+ " La cantidad de cupos no puede ser negativa ni cero")
             bandera=True
 
+        if numeroGrupo <1:
+            errores.append("Grupo:"+ str(numero)+ " El numero de grupo no puede ser negativo ni cero")
+            bandera=True
+
         if bandera==True:
             numero=numero+1
             continue
@@ -1492,6 +1497,7 @@ def regGrupoT(request):
             id_materia=materia,
             id_docente=docente,
             cupo=cupo,
+            numero_grupo= numeroGrupo,
             L=L,
             M=M,
             X=X,
@@ -1531,12 +1537,11 @@ def regInscripcion(request):
     data = json.loads(request.body)
     idCiclo= data["idCiclo"]
     nombre= data["nombre"]
-    dia=datetime.datetime.strptime(data["dia"], "%Y-%m-%d") 
-    hora_inicio= datetime.datetime.strptime(data["horaInicio"], "%H:%M:%S")
-    hora_fin= datetime.datetime.strptime(data["horaFin"], "%H:%M:%S")
+    fecha_inicio= datetime.datetime.strptime(data["diaInicio"], "%Y-%m-%d %H:%M:%S")
+    fecha_fin= datetime.datetime.strptime(data["diaFin"], "%Y-%m-%d %H:%M:%S")
 
-    if hora_inicio > hora_fin:
-        errores.append("hora fin no puede ser menor a hora inicio")
+    if fecha_inicio > fecha_fin:
+        errores.append("fecha de fin no puede ser menor a fecha de inicio")
         bandera=True
 
     try:
@@ -1554,9 +1559,8 @@ def regInscripcion(request):
     else:
         m=inscripcion.objects.create(nombre=nombre, 
         id_ciclo=Ciclo,
-        dia=dia,
-        hora_inicio=hora_inicio,
-        hora_fin=hora_fin,
+        fecha_inicio=fecha_inicio,
+        fecha_fin=fecha_fin,
         activo=True)
         content = {'guardado': True}
         return Response(content, status=status.HTTP_201_CREATED)
@@ -1572,7 +1576,8 @@ def getInscripcion(request):
             'id': m.id_inscripcion,
             'nombre':m.nombre,
             'ciclo':str(m.id_ciclo.numero) + " "+str(m.id_ciclo.anio),
-            'dia':m.dia,
+            'diaInicio':fecha_inicio,
+            'diaFin':fecha_fin,
             'horaInicio':m.hora_inicio,
             'horaFin':m.hora_fin
         }
