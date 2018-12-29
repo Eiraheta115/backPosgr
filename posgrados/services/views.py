@@ -1569,7 +1569,7 @@ def regInscripcion(request):
 @permission_classes((AllowAny, ))
 def getInscripcion(request):
     data=[]
-    inscripciones=inscripcion.objects.filter(activo=True)
+    inscripciones=inscripcion.objects.all()
     for m in inscripciones:
         
         json={
@@ -1577,7 +1577,8 @@ def getInscripcion(request):
             'nombre':m.nombre,
             'ciclo':str(m.id_ciclo.numero) + " "+str(m.id_ciclo.anio),
             'diaInicio':m.fecha_inicio,
-            'diaFin':m.fecha_fin
+            'diaFin':m.fecha_fin,
+            'estado':m.activo
         }
         data.append(json)
     content = {"inscripciones": data}
