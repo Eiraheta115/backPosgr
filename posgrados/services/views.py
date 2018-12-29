@@ -1576,10 +1576,8 @@ def getInscripcion(request):
             'id': m.id_inscripcion,
             'nombre':m.nombre,
             'ciclo':str(m.id_ciclo.numero) + " "+str(m.id_ciclo.anio),
-            'diaInicio':fecha_inicio,
-            'diaFin':fecha_fin,
-            'horaInicio':m.hora_inicio,
-            'horaFin':m.hora_fin
+            'diaInicio':m.fecha_inicio,
+            'diaFin':m.fecha_fin
         }
         data.append(json)
     content = {"inscripciones": data}
