@@ -256,3 +256,15 @@ class inscripcion(models.Model):
     fecha_inicio=models.DateTimeField()
     fecha_fin=models.DateTimeField()
     activo=models.BooleanField()
+
+class solventes(models.Model):
+    id_solvente=models.AutoField(primary_key=True)
+    permiso=models.BooleanField()
+    id_aspirante=models.ForeignKey('Aspirante', models.SET_NULL, blank=True, null = True,)
+    id_inscripcion=models.ForeignKey('inscripcion', models.SET_NULL, blank=True, null = True,)
+
+class seleccion(models.Model):
+    id_seleccion=models.AutoField(primary_key=True)
+    fecha_hora=models.DateTimeField()
+    id_aspirante=models.ForeignKey('Aspirante', models.SET_NULL, blank=True, null = True,)
+    id_grupo=models.ForeignKey('grupoTeorico', models.SET_NULL, blank=True, null = True,)

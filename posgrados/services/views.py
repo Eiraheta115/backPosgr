@@ -8,7 +8,7 @@ from .serializers import UserSerializer,EncuestaSerializer,RespuestasSerializer,
 from rest_framework import status, viewsets, generics, mixins
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento, grupoTeorico, inscripcion
+from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento, grupoTeorico, inscripcion, solventes, seleccion
 from rest_framework.authtoken.models import Token
 import json,time, random, requests, hashlib, calendar, datetime
 
@@ -1608,3 +1608,64 @@ def unableInscripcion(request, id_inscripcion):
 def greetings(request):
     content = {"msj": "Hi humans! don't panic we are posgrados cchh ;)"}
     return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['POST']) 
+@permission_classes((AllowAny,))   
+def genSolventes(request, id_inscripcion):
+    errores=[]
+    bandera=False
+    data = json.loads(request.body)
+    try:
+        ins= inscripcion.objects.get(id_inscripcion=id_inscripcion)
+        if ins.activo==False:
+            errores.append("La inscripcion debe estar activa")
+            bandera=True    
+    except inscripcion.DoesNotExist:
+        errores.append("Inscripcion no encontrada")
+        bandera=True
+    if bandera == False:
+        Aspirantes= Aspirante.objects.filter(aceptado=True)
+        for asp in Aspirantes:
+            ##Validacion para guardar aspirante sin permiso de inscripcion
+            solv=solventes.objects.create(
+                permiso=True,
+                id_inscripcion=ins,
+                id_aspirante=asp
+            )
+        content = {'guardados': True}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        content = {'errores': errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unablePermisoEst(request, id_estudiante,id_inscripcion):
+    try:
+        m= solventes.objects.get(id_aspirante=id_estudiante, id_inscripcion=id_inscripcion)
+        m.permiso=False
+        m.save()
+        content = {'editado': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except solventes.DoesNotExist:
+        content = {'Error': 'El aspirante o grupo teorico no existe'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detEstudiante(request, id_estudiante):
+    try:
+        m= Aspirante.objects.get(id_aspirante=id_estudiante, aceptado=True)
+        json={
+            'id_estudiante':m.id_aspirante,
+            'nombre':m.nombreuser_aspirante,
+            'id_programa': m.id_programa.id_programa,
+            'codigo_programa': m.id_programa.codigo,
+            'nombre_programa': m.id_programa.nombre,
+            'plan_estudio': m.id_programa.plan_estudio
+        }
+        content = {'Estudiante': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except Aspirante.DoesNotExist:
+        content = {'Error' :'Estudiante no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)

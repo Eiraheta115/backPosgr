@@ -67,7 +67,7 @@ urlpatterns = [
     url(r'^services/encuestas/$',views.regEncuesta, name='encuestas-create'),
     url(r'^services/encuestas/all/$',views.getCategoria, name='encuestas-all'),
     url(r'^services/encuestas/(?P<id_categoria>(\d+))/$',views.detCategoria, name='encuestas-update'),
-    
+    ##Respuestas
     url(r'^services/respuestas/$',views.RespuestaApiCreate.as_view(), name='respuestas-create'),
     url(r'^services/respuestas/(?P<id_respuesta>(\d+))/$',views.RespuestaApiCreateRetrive.as_view(), name='respuestas-retrive'),
     url(r'^services/clasificacion/$',views.ClasificacionApiCreate.as_view(), name='clasificacion-create'),
@@ -102,4 +102,10 @@ urlpatterns = [
     url(r'^services/inscripciones/$',views.regInscripcion, name='ins-create'),
     url(r'^services/inscripciones/all/$',views.getInscripcion, name='ins-all'),
     url(r'^services/inscripciones/unable/(?P<id_inscripcion>(\d+))/$',views.unableInscripcion, name='ins-unable'),
+    #url(r'^services/solventes/estudiantes/inscripcion/(?P<id_estudiante>(\d+))/inscripcion/(?P<id_inscripcion>(\d+))/$',views.insEstudiante, name='ins-estudiante'),
+    ##Solventes
+    url(r'^services/solventes/inscripcion/(?P<id_inscripcion>(\d+))/$',views.genSolventes, name='gen-solventes'),
+    url(r'^services/solventes/estudiantes/unable/(?P<id_estudiante>(\d+))/inscripcion/(?P<id_inscripcion>(\d+))/$',views.unablePermisoEst, name='perm-unable'),
+    ##Estudiantes
+    url(r'^services/estudiantes/(?P<id_estudiante>(\d+))/$',views.detEstudiante, name='estudiante-det'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
