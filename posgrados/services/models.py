@@ -42,7 +42,7 @@ class Aspirante (models.Model) :
     f_expedicion = models.DateField()
     municipio = models.CharField(max_length=50)
     lugar_trab = models.CharField(max_length=50)
-    programa = models.CharField(max_length=50)
+    id_programa = models.ForeignKey('Programa', models.SET_NULL, blank=True, null=True, )
     aceptado = models.BooleanField(blank=True, default=False)
     id_user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, )
     id_val = models.ForeignKey('validacion', models.SET_NULL, blank=True, null=True, )

@@ -706,6 +706,12 @@ def regApirante(request):
         except Validacion.DoesNotExist:
             content = {"msj": "codigo no existe"}
             return Response(content, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            pro = Programa.objects.get(id_programa=data["idPrograma"])
+        except Programa.DoesNotExist:
+            content = {"msj": "Programa no existe"}
+            return Response(content, status=status.HTTP_404_NOT_FOUND)
 
         Aspirante.objects.create(
             nombre_aspirante=data["nombreAsp"],
@@ -722,7 +728,7 @@ def regApirante(request):
             f_expedicion=data["f_expedicion"],
             municipio=data["municipio"], 
             lugar_trab=data["lugar_trab"],  
-            programa=data["programa"],
+            id_programa=pro,
             aceptado=False,
             nombreuser_aspirante=data["nombreuser_aspirante"],
             id_user=u,
