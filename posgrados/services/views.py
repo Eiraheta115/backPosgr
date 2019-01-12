@@ -8,7 +8,7 @@ from .serializers import UserSerializer,EncuestaSerializer,RespuestasSerializer,
 from rest_framework import status, viewsets, generics, mixins
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.response import Response
-from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento, grupoTeorico, inscripcion, solventes, seleccion
+from .models import  Noticia, Aspirante,Image,Encuentas,Respuesta,Catergoria, Docente, Pasos ,Procedimiento, Cita, Validacion,Pregunta,Clasificacion, Programa, ciclo, Materia, aula, horario, Documento, descuento, grupoTeorico, inscripcion, solventes, seleccion, cuota, arancel, pago
 from rest_framework.authtoken.models import Token
 import json,time, random, requests, hashlib, calendar, datetime
 
@@ -1668,4 +1668,140 @@ def detEstudiante(request, id_estudiante):
         return Response(content, status=status.HTTP_200_OK)
     except Aspirante.DoesNotExist:
         content = {'Error' :'Estudiante no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regDescuento(request):
+    errores= []
+    bandera= False
+    data = json.loads(request.body)
+    nombre= data["nombre"]
+    descripcion= data["descripcion"]
+    monto = data["monto"]
+    if monto <= 0.00:
+        errores.append("El monto no puede ser negativo ni igual a cero")
+        bandera=True
+    if bandera == True:
+        content = {'Errores' :errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        a= descuento.objects.create(nombre=nombre, descripcion=descripcion, monto=monto, activo=True)
+        content = {'guardado': True}
+        return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getDescuento(request):
+    data=[]
+    descuentos=descuento.objects.all()
+    for a in descuentos:
+        json={
+            'id': a.id_descuento,
+            'nombre': a.nombre,
+            'descripcion': a.descripcion,
+            'monto':a.monto,
+            'estado':a.activo,
+        }
+        data.append(json)
+    content = {"descuentos": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detDescuento(request, id_descuento):
+    try:
+        a= descuento.objects.get(id_descuento=id_descuento)
+        json={
+            'id': a.id_descuento,
+            'nombre': a.nombre,
+            'descripcion': a.descripcion,
+            'monto':a.monto,
+            'estado':a.activo,
+        }
+        content = {'descuento': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except descuento.DoesNotExist:
+        content = {'Error','descuento no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unableDescuento(request, id_descuento):
+    try:
+        a= descuento.objects.get(id_descuento=id_descuento)
+        a.activo=False
+        a.save()
+        content = {'editado': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except descuento.DoesNotExist:
+        content = {'Error','descuento no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def regArancel(request):
+    errores= []
+    bandera= False
+    data = json.loads(request.body)
+    nombre= data["nombre"]
+    descripcion= data["descripcion"]
+    monto = data["monto"]
+    if monto <= 0.00:
+        errores.append("El monto no puede ser negativo ni igual a cero")
+        bandera=True
+    if bandera == True:
+        content = {'Errores' :errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        a= arancel.objects.create(nombre=nombre, descripcion=descripcion, monto=monto, activo=True)
+        content = {'guardado': True}
+        return Response(content, status=status.HTTP_201_CREATED)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getArancel(request):
+    data=[]
+    aranceles=arancel.objects.all()
+    for a in aranceles:
+        json={
+            'id': a.id_arancel,
+            'nombre': a.nombre,
+            'descripcion': a.descripcion,
+            'monto':a.monto,
+            'estado':a.activo,
+        }
+        data.append(json)
+    content = {"aranceles": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detArancel(request, id_arancel):
+    try:
+        a= arancel.objects.get(id_arancel=id_arancel)
+        json={
+            'id': a.id_arancel,
+            'nombre': a.nombre,
+            'descripcion': a.descripcion,
+            'monto':a.monto,
+            'estado':a.activo,
+        }
+        content = {'arancel': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except arancel.DoesNotExist:
+        content = {'Error','arancel no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))
+def unableArancel(request, id_arancel):
+    try:
+        a= arancel.objects.get(id_arancel=id_arancel)
+        a.activo=False
+        a.save()
+        content = {'editado': True}
+        return Response(content, status=status.HTTP_200_OK)
+    except arancel.DoesNotExist:
+        content = {'Error','arancel no encontrado'}
         return Response(content, status=status.HTTP_404_NOT_FOUND)

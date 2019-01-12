@@ -108,4 +108,14 @@ urlpatterns = [
     url(r'^services/solventes/estudiantes/unable/(?P<id_estudiante>(\d+))/inscripcion/(?P<id_inscripcion>(\d+))/$',views.unablePermisoEst, name='perm-unable'),
     ##Estudiantes
     url(r'^services/estudiantes/(?P<id_estudiante>(\d+))/$',views.detEstudiante, name='estudiante-det'),
+    ##Descuentos
+    url(r'^services/descuentos/$',views.regDescuento, name='descuento-create'),
+    url(r'^services/descuentos/all/$',views.getDescuento, name='descuento-all'),
+    url(r'^services/descuentos/(?P<id_descuento>(\d+))/$',views.detDescuento, name='descuento-det'),
+    url(r'^services/descuentos/unable/(?P<id_descuento>(\d+))/$',views.unableDescuento, name='descuento-unable'),
+    ##Aranceles
+    url(r'^services/aranceles/$',views.regArancel, name='arancel-create'),
+    url(r'^services/aranceles/all/$',views.getArancel, name='arancel-all'),
+    url(r'^services/aranceles/(?P<id_arancel>(\d+))/$',views.detArancel, name='arancel-det'),
+    url(r'^services/aranceles/unable/(?P<id_arancel>(\d+))/$',views.unableArancel, name='arancel-unable'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

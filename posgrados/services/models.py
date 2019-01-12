@@ -175,7 +175,32 @@ class descuento(models.Model):
     id_descuento=models.AutoField(primary_key=True)
     nombre=models.CharField(max_length=256, blank=True, null=True)
     descripcion=models.CharField(max_length=1024, blank=True, null=True)
+    monto=models.DecimalField(max_digits=7,decimal_places=2)
     activo=models.BooleanField(blank=True)
+
+class arancel(models.Model):
+    id_arancel=models.AutoField(primary_key=True)
+    monto=models.DecimalField(max_digits=7,decimal_places=2)
+    nombre=models.CharField(max_length=50)
+    descripcion=models.CharField(max_length=1000)
+    activo=models.BooleanField()
+
+class pago(models.Model):
+    id_pago=models.AutoField(primary_key=True)
+    monto=models.DecimalField(max_digits=7,decimal_places=2)
+    descripcion=models.CharField(max_length=1000)
+    fecha=models.DateField()
+    id_descuento=models.ForeignKey('descuento', models.SET_NULL, blank=True, null=True, )
+    id_arancel=models.ForeignKey('arancel', models.SET_NULL, blank=True, null=True, )
+
+class cuota(models.Model):
+    id_cuota=models.AutoField(primary_key=True)
+    montoTotal=models.DecimalField(max_digits=7,decimal_places=2)
+    descuentoTotal=models.DecimalField(max_digits=7,decimal_places=2)
+    verificado=models.BooleanField()
+    fecha_verificado=models.DateField()
+    numero_recibido=models.CharField(max_length=20)
+    codigo_barra=models.CharField(max_length=60)
 
 class Clasificacion(models.Model):
     id_clasificacion=models.AutoField(primary_key=True)
