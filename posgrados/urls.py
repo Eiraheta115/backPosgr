@@ -121,4 +121,6 @@ urlpatterns = [
     url(r'^services/aranceles/all/$',views.getArancel, name='arancel-all'),
     url(r'^services/aranceles/(?P<id_arancel>(\d+))/$',views.detArancel, name='arancel-det'),
     url(r'^services/aranceles/unable/(?P<id_arancel>(\d+))/$',views.unableArancel, name='arancel-unable'),
+    #cuotas
+    url(r'^services/cuotas/$',views.genCuotas, name='cuotas-masscreate'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

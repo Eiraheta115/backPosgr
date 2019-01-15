@@ -1793,6 +1793,15 @@ def regArancel(request):
     cod= data["codigo"]
     monto = data["monto"]
     tip=data["tipo"]
+    desc=data["descuento"]
+    try:
+        de= descuento.objects.get(id_descuento=desc)
+        if de.activo==False:
+            errores.append("El descuento debe estar activo")
+            bandera=True    
+    except descuento.DoesNotExist:
+        errores.append("descuento no encontrado")
+        bandera=True    
     if monto <= 0.00:
         errores.append("El monto no puede ser negativo ni igual a cero")
         bandera=True
@@ -1803,7 +1812,7 @@ def regArancel(request):
         content = {'Errores' :errores}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     else:
-        a= arancel.objects.create(codigo=cod, nombre=nombre, descripcion=descripcion, tipo=tip, monto=monto, activo=True)
+        a= arancel.objects.create(codigo=cod, nombre=nombre, descripcion=descripcion, tipo=tip, monto=monto, activo=True, id_descuento=de)
         content = {'guardado': True}
         return Response(content, status=status.HTTP_201_CREATED)
 
@@ -1884,3 +1893,56 @@ def unableArancel(request, id_arancel):
     except arancel.DoesNotExist:
         content = {'Error','arancel no encontrado'}
         return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes((AllowAny, ))
+def genCuotas(request):
+    errores= []
+    bandera= False
+    data = json.loads(request.body)
+    year= data["anio"]
+    if year <2019:
+        errores.append("El año no puede ser menor a 2019")
+        bandera=True
+    cuotas=cuota.objects.filter(anio=year)
+    if cuotas:
+        errores.append("Ya genero cuotas para este año")
+        bandera=True
+    if bandera==True:
+        content={'errores':errores}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        aranceles=arancel.objects.filter(activo=True)
+        estudiantes=Aspirante.objects.filter(aceptado=True)
+        for e in estudiantes:
+            for a in aranceles:
+                if a.tipo==1: 
+                    contador=1
+                    nombre="Pre inscripcion"
+                if a.tipo==2: 
+                    contador=1
+                    nombre="Ingreso a pogrados"
+                if a.tipo==3: 
+                    contador=1
+                    nombre="Matricula anual"                                                            
+                if a.tipo==4:
+                    contador=10
+                    nombre="Matricula mensual" 
+                for x in range(contador):
+                    if a.tipo==4:
+                        nombre="Matricula mensual " +str(x+1)
+                    cuota.objects.create(
+                        id_arancel=a,
+                        id_estudiante=e,
+                        montoTotal=round(a.monto-a.monto*a.id_descuento.monto/100,2),
+                        descuentoTotal=round(a.monto*a.id_descuento.monto/100,2),
+                        verificado=False,
+                        cancelado=False,
+                        nombre=nombre,
+                        anio=year
+                    )
+                    nombre=""
+        content = {'guardado': True}
+        return Response(content, status=status.HTTP_201_CREATED)
+
+    
