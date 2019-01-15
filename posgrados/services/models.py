@@ -181,6 +181,7 @@ class descuento(models.Model):
 class arancel(models.Model):
     id_arancel=models.AutoField(primary_key=True)
     codigo=models.CharField(max_length=10)
+    tipo=models.IntegerField()
     monto=models.DecimalField(max_digits=7,decimal_places=2)
     nombre=models.CharField(max_length=50)
     descripcion=models.CharField(max_length=1000)

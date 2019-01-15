@@ -1792,14 +1792,18 @@ def regArancel(request):
     descripcion= data["descripcion"]
     cod= data["codigo"]
     monto = data["monto"]
+    tip=data["tipo"]
     if monto <= 0.00:
         errores.append("El monto no puede ser negativo ni igual a cero")
         bandera=True
+    if tip <= 0:
+        errores.append("El tipo de arancel no puede ser negativo ni igual a cero")
+        bandera=True        
     if bandera == True:
         content = {'Errores' :errores}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     else:
-        a= arancel.objects.create(codigo=cod, nombre=nombre, descripcion=descripcion, monto=monto, activo=True)
+        a= arancel.objects.create(codigo=cod, nombre=nombre, descripcion=descripcion, tipo=tip, monto=monto, activo=True)
         content = {'guardado': True}
         return Response(content, status=status.HTTP_201_CREATED)
 
@@ -1812,6 +1816,7 @@ def getArancel(request):
         json={
             'id': a.id_arancel,
             'codigo':a.codigo,
+            'tipo':a.tipo,
             'nombre': a.nombre,
             'descripcion': a.descripcion,
             'monto':a.monto,
@@ -1823,12 +1828,39 @@ def getArancel(request):
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
+def getTipoArancel(request):
+    data=[]
+    T1={
+        'id':1, 'Nombre':'Pre inscripcion'
+    }
+
+    T2={
+        'id':2, 'Nombre':'Ingreso a pogrados'
+    }
+
+    T3={
+        'id':3, 'Nombre':'Matricula anual'
+    }
+
+    T4={
+        'id':4, 'Nombre':'Cuota Mensual'
+    }
+    data.append(T1)
+    data.append(T2)
+    data.append(T3)
+    data.append(T4)
+    content = {"Tipos": data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
 def detArancel(request, id_arancel):
     try:
         a= arancel.objects.get(id_arancel=id_arancel)
         json={
             'id': a.id_arancel,
             'codigo':a.codigo,
+            'tipo':a.tipo,
             'nombre': a.nombre,
             'descripcion': a.descripcion,
             'monto':a.monto,

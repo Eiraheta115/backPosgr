@@ -117,6 +117,7 @@ urlpatterns = [
     url(r'^services/descuentos/unable/(?P<id_descuento>(\d+))/$',views.unableDescuento, name='descuento-unable'),
     ##Aranceles
     url(r'^services/aranceles/$',views.regArancel, name='arancel-create'),
+    url(r'^services/aranceles/tipos/$',views.getTipoArancel, name='arancel-create'),
     url(r'^services/aranceles/all/$',views.getArancel, name='arancel-all'),
     url(r'^services/aranceles/(?P<id_arancel>(\d+))/$',views.detArancel, name='arancel-det'),
     url(r'^services/aranceles/unable/(?P<id_arancel>(\d+))/$',views.unableArancel, name='arancel-unable'),
