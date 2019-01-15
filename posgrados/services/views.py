@@ -1746,6 +1746,7 @@ def regArancel(request):
     data = json.loads(request.body)
     nombre= data["nombre"]
     descripcion= data["descripcion"]
+    cod= data["codigo"]
     monto = data["monto"]
     if monto <= 0.00:
         errores.append("El monto no puede ser negativo ni igual a cero")
@@ -1754,7 +1755,7 @@ def regArancel(request):
         content = {'Errores' :errores}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     else:
-        a= arancel.objects.create(nombre=nombre, descripcion=descripcion, monto=monto, activo=True)
+        a= arancel.objects.create(codigo=cod, nombre=nombre, descripcion=descripcion, monto=monto, activo=True)
         content = {'guardado': True}
         return Response(content, status=status.HTTP_201_CREATED)
 
@@ -1766,6 +1767,7 @@ def getArancel(request):
     for a in aranceles:
         json={
             'id': a.id_arancel,
+            'codigo':a.codigo,
             'nombre': a.nombre,
             'descripcion': a.descripcion,
             'monto':a.monto,
@@ -1782,6 +1784,7 @@ def detArancel(request, id_arancel):
         a= arancel.objects.get(id_arancel=id_arancel)
         json={
             'id': a.id_arancel,
+            'codigo':a.codigo,
             'nombre': a.nombre,
             'descripcion': a.descripcion,
             'monto':a.monto,
