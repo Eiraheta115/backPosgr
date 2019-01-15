@@ -1670,6 +1670,50 @@ def detEstudiante(request, id_estudiante):
         content = {'Error' :'Estudiante no encontrado'}
         return Response(content, status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def detFullEstudiante(request, id_estudiante):
+    try:
+        m= Aspirante.objects.get(id_aspirante=id_estudiante, aceptado=True)
+        json={
+            'id_estudiante':m.id_aspirante,
+            'nombre':m.nombre_aspirante,
+            'apellido':m.apellido_aspirante,
+            'genero':m.genero,
+            'fechaNacimiento':m.fechas_nac,
+            'direccion':m.municipio,
+            'dui':m.dui,
+            'telefonoFijo':m.t_fijo,
+            'telefonoMovil':m.t_movil,
+            'email':m.email,
+            'titulo_pre': m.titulo_pre,
+            'codigo_programa': m.id_programa.codigo,
+            'institucion': m.institucion
+        }
+        content = {'Estudiante': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except Aspirante.DoesNotExist:
+        content = {'Error' :'Estudiante no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+def getEstudiante(request):
+    data=[]
+    estudiantes= Aspirante.objects.filter(aceptado=True)
+    for m in estudiantes:
+        json={
+            'id_estudiante':m.id_aspirante,
+            'nombre':m.nombreuser_aspirante,
+            'id_programa': m.id_programa.id_programa,
+            'codigo_programa': m.id_programa.codigo,
+            'nombre_programa': m.id_programa.nombre,
+            'plan_estudio': m.id_programa.plan_estudio
+        }
+        data.append(json)
+    content = {'Estudiantes': data}
+    return Response(content, status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 def regDescuento(request):

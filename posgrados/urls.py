@@ -108,6 +108,8 @@ urlpatterns = [
     url(r'^services/solventes/estudiantes/unable/(?P<id_estudiante>(\d+))/inscripcion/(?P<id_inscripcion>(\d+))/$',views.unablePermisoEst, name='perm-unable'),
     ##Estudiantes
     url(r'^services/estudiantes/(?P<id_estudiante>(\d+))/$',views.detEstudiante, name='estudiante-det'),
+    url(r'^services/estudiantes/full/(?P<id_estudiante>(\d+))/$',views.detFullEstudiante, name='estudiante-det'),
+    url(r'^services/estudiantes/all/$',views.getEstudiante, name='descuento-all'),
     ##Descuentos
     url(r'^services/descuentos/$',views.regDescuento, name='descuento-create'),
     url(r'^services/descuentos/all/$',views.getDescuento, name='descuento-all'),
