@@ -2006,4 +2006,77 @@ def detCuota(request, id_cuota):
         content = {'Error':'cuota no encontrada'}
         return Response(content, status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['GET'])
+@permission_classes((AllowAny, ))    
+def getCuotasResEstudiante(request, id_estudiante, year):
+    data=[]
+    try:
+        estudiante= Aspirante.objects.get(id_aspirante=id_estudiante)
+        if estudiante.aceptado==False:
+            content={'Error':'Aspirante no seleccionado como estudiante'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    except Aspirante.DoesNotExist:
+        content={'Error':'Estudiante no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+    cuotas=cuota.objects.filter(id_estudiante=estudiante.id_aspirante, anio=year)
+    for a in cuotas:
+        if a.fecha_recibido is None:
+            fechaR=""
+        else:
+            fechaR=a.fecha_recibido
+        json={
+            'id':a.id_cuota,
+            'arancel':a.nombre,
+            'monto':a.montoTotal
+        }
+        data.append(json)
+    content={'cuotas':data}
+    return Response(content, status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))    
+def pagoCuotas(request):
+    errores= []
+    exitos= []
+    bandera= False
+    data = json.loads(request.body)
+    fecha_registro= datetime.datetime.strptime(data["fecha"], "%Y-%m-%d")
+    cuotas=data["cuotas"]
+    numero_recibido=data["numero_recibido"]
+    codigo_barra=data["codigo_barra"]
+    for a in cuotas:
+        try:
+            c=cuota.objects.get(id_cuota=a)
+            c.cancelado=True
+            c.fecha_recibido=fecha_registro
+            c.numero_recibido=numero_recibido
+            c.codigo_barra=codigo_barra
+            c.save()
+            exitos.append("La cuota con id "+str(a)+" fue guardado correctamente")
+        except cuota.DoesNotExist:
+            errores.append("La cuota con id "+str(a)+" no existe")
+    content={'Errores':errores, 'Exitos':exitos}
+    return Response(content, status=status.HTTP_202_ACCEPTED)
+    
+@api_view(['PUT'])
+@permission_classes((AllowAny, ))    
+def verificarCuotas(request):
+    errores= []
+    exitos= []
+    bandera= False
+    data = json.loads(request.body)
+    fecha_registro= datetime.datetime.strptime(data["fecha"], "%Y-%m-%d")
+    cuotas=data["cuotas"]
+    for a in cuotas:
+        try:
+            c=cuota.objects.get(id_cuota=a)
+            c.verificado=True
+            c.fecha_verificado=fecha_registro
+            c.save()
+            exitos.append("La cuota con id "+str(a)+" fue verificada correctamente")
+        except cuota.DoesNotExist:
+            errores.append("La cuota con id "+str(a)+" no existe")
+    content={'Errores':errores, 'Exitos':exitos}
+    return Response(content, status=status.HTTP_202_ACCEPTED)
+
 
