@@ -1706,6 +1706,7 @@ def getEstudiante(request):
         json={
             'id_estudiante':m.id_aspirante,
             'nombre':m.nombreuser_aspirante,
+            'email':m.email,
             'id_programa': m.id_programa.id_programa,
             'codigo_programa': m.id_programa.codigo,
             'nombre_programa': m.id_programa.nombre,
