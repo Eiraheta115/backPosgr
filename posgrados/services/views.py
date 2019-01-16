@@ -1945,4 +1945,36 @@ def genCuotas(request):
         content = {'guardado': True}
         return Response(content, status=status.HTTP_201_CREATED)
 
-    
+@api_view(['GET'])
+@permission_classes((AllowAny, ))    
+def getCuotasEstudiante(request, id_estudiante, year):
+    data=[]
+    try:
+        estudiante= Aspirante.objects.get(id_aspirante=id_estudiante)
+        if estudiante.aceptado==False:
+            content={'Error':'Aspirante no seleccionado como estudiante'}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    except Aspirante.DoesNotExist:
+        content={'Error':'Estudiante no encontrado'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+    cuotas=cuota.objects.filter(id_estudiante=estudiante.id_aspirante, anio=year)
+    for a in cuotas:
+        if a.fecha_recibido is None:
+            fechaR=""
+        else:
+            fechaR=a.fecha_recibido
+        json={
+            'id':a.id_cuota,
+            'arancel':a.nombre,
+            'monto':a.montoTotal,
+            'año':a.anio,
+            'fecha_recibido':fechaR,
+            'cancelado':a.cancelado,
+            'numero_recibido':a.numero_recibido,
+            'codigo_barra':a.codigo_barra,
+            'verificado':a.verificado
+        }
+        data.append(json)
+    content={'cuotas':data}
+    return Response(content, status=status.HTTP_200_OK)
+

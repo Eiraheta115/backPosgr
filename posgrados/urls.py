@@ -123,4 +123,5 @@ urlpatterns = [
     url(r'^services/aranceles/unable/(?P<id_arancel>(\d+))/$',views.unableArancel, name='arancel-unable'),
     #cuotas
     url(r'^services/cuotas/$',views.genCuotas, name='cuotas-masscreate'),
+    url(r'^services/solventes/consultarPagos/estudiante/(?P<id_estudiante>(\d+))/year/(?P<year>(\d+))/$',views.getCuotasEstudiante, name='cuotas-estudiante'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
