@@ -125,4 +125,8 @@ urlpatterns = [
     url(r'^services/cuotas/$',views.genCuotas, name='cuotas-masscreate'),
     url(r'^services/consultarPagos/estudiante/(?P<id_estudiante>(\d+))/year/(?P<year>(\d+))/$',views.getCuotasEstudiante, name='cuotas-estudiante'),
     url(r'^services/cuotas/(?P<id_cuota>(\d+))/$',views.detCuota, name='arancel-det'),
+    url(r'^services/cuotas/resumido/estudiante/(?P<id_estudiante>(\d+))/year/(?P<year>(\d+))/$',views.getCuotasResEstudiante, name='cuotas-estudianteres'),
+    #pagos
+    url(r'^services/pagos/cuotas/$',views.pagoCuotas, name='cuotas-pago'),
+    url(r'^services/verificar/cuotas/$',views.verificarCuotas, name='cuotas-verificar'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
