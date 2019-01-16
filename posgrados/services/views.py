@@ -1978,3 +1978,31 @@ def getCuotasEstudiante(request, id_estudiante, year):
     content={'cuotas':data}
     return Response(content, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+@permission_classes((AllowAny, ))    
+def detCuota(request, id_cuota):
+    try:
+        a= cuota.objects.get(id_cuota=id_cuota)
+        if a.fecha_recibido is None:
+            fechaR=""
+        else:
+            fechaR=a.fecha_recibido
+        json={
+            'id':a.id_cuota,
+            'arancel':a.nombre,
+            'monto':a.montoTotal,
+            'monto_descuento': a.descuentoTotal,
+            'año':a.anio,
+            'fecha_recibido':fechaR,
+            'cancelado':a.cancelado,
+            'numero_recibido':a.numero_recibido,
+            'codigo_barra':a.codigo_barra,
+            'verificado':a.verificado
+        }
+        content = {'cuota': json}
+        return Response(content, status=status.HTTP_200_OK)
+    except cuota.DoesNotExist:
+        content = {'Error':'cuota no encontrada'}
+        return Response(content, status=status.HTTP_404_NOT_FOUND)
+
+
